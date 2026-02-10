@@ -1,0 +1,314 @@
+\documentclass[a4paper,12pt]{scrreprt}
+    %% Used for changing geometry of the page
+    %% Cover page text cannot overlay cover sketching/style 
+    %% https://ctan.org/pkg/geometry?lang=en
+\usepackage{geometry}
+    %% Changes language of some packages protocols
+    %% e.g., when captioning images: Figure 1. -> Figura 1.
+    %% https://ctan.org/pkg/babel?lang=en
+\usepackage[portuguese]{babel}
+    %% Used for special fonts
+    %% Cannot be compiled with pdflatex
+    %% https://ctan.org/pkg/fontspec?lang=en
+\usepackage{fontspec}
+    %% Arial FONT
+    \setmainfont{Arial}
+
+    %% More colors and color options
+    %% https://ctan.org/pkg/xcolor?lang=en
+    %% https://ctan.org/pkg/colortbl?lang=en
+\usepackage{xcolor,colortbl}
+    %% More tabular options, like dashed/dotted lines
+    %% https://ctan.org/pkg/arydshln?lang=en
+\usepackage{arydshln}
+    %% List of acronyms
+    %% https://ctan.org/pkg/nomencl?lang=en
+\usepackage[intoc]{nomencl}
+    %% Must be called to init nomencl environment  
+    \makenomenclature
+    %% More images options/settings
+    %% https://ctan.org/pkg/graphicx?lang=en
+\usepackage{graphics}
+    %% Defining subdirectories to image path enviornment
+    %% \graphicspath{{sub1}{sub2}...{subN}}
+    \graphicspath{{images}}
+    
+    %% used to handle cross-referencing commands in LaTeX to produce hypertext links in the document
+    %% https://ctan.org/pkg/hyperref?lang=en
+\usepackage{hyperref}
+    %% math environments
+    %% https://ctan.org/pkg/amsmath?lang=en
+
+    %% settings
+    \hypersetup{
+        colorlinks,
+        citecolor=black,
+        filecolor=black,
+        linkcolor=black,
+        urlcolor=black
+    }
+
+\usepackage{amsmath}
+    %% Defining backgrouns, used to make the cover
+    %% https://ctan.org/pkg/background?lang=en
+\usepackage[some]{background}
+    %% Used to make drawings or complex graphics
+    %% http://pgf.sourceforge.net/pgf_CVS.pdf
+\usepackage{tikz}
+    %% Tikz library to point operations ((x1,y1) + (x2,y2))
+    \usetikzlibrary{calc}
+
+%% Defining sfdefault font and default font for document
+\renewcommand{\familydefault}{\sfdefault}
+
+
+%% Costume made cover 
+%% From there you can use \makecover command to build the cover
+\include{cover}
+
+%==========================================================================
+% DOCUMENT
+%==========================================================================
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+% builds the cover
+\makecover
+
+%% smaller footer and header size
+\newgeometry{top=3cm,left=3cm,right=3cm,bottom=4cm}
+
+%==========================================================================
+% BEGIN OPCIONAL DEDICATÓRIA
+%==========================================================================
+
+\clearpage
+\begin{center}
+    \thispagestyle{empty}
+    \vspace*{\fill}
+    
+    $<<$/opcional Dedicatória$>>$
+    
+    \vspace*{\fill}
+\end{center}
+\clearpage
+
+%==========================================================================
+% END OPCIONAL DEDICATÓRIA
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN ABSTRACT PAGE
+%==========================================================================
+
+
+
+%% Abstract name: \Large font size, flushed left and paragraph skip before abstract content
+\renewenvironment{abstract}
+ {\par\noindent\textbf{\Large\abstractname}\par\bigskip}
+ {}
+
+\begin{flushleft}
+\begin{abstract}
+    <<O resumo tem como objectivo descrever de forma sucinta o trabalho realizado. Deverá conter uma pequena introdução, seguida por uma breve descrição do trabalho realizado e terminando com uma indicação sumária do seu estado final. Não deverá exceder as 400 palavras.>> 
+    \par \textbf{Área de Aplicação}: <<Identificação da Área de trabalho. Por exemplo: Desenho e arquitectura de Sistemas de Bases de Dados.>> 
+    \par \textbf{Palavras-Chave}: <<Conjunto de palavras-chave que permitirão referenciar domínios de conhecimento, tecnologias, estratégias, etc., directa ou indirectamente referidos no relatório. Por exemplo: Bases de Dados Relacionais, Gestão de Índices, JAVA, Protocolos de Comunicação.>>
+\end{abstract}
+\end{flushleft}
+
+
+\pagebreak
+
+%==========================================================================
+% END ABSTRACT PAGE 
+%==========================================================================
+
+%==========================================================================
+% BEGIN INDEXES PAGES
+%==========================================================================
+
+%% Changes table of content name
+%% Portuguese babel default : "Conteúdo"
+%% Personally I prefer "índice"
+\renewcommand{\contentsname}{Índice}
+
+\tableofcontents
+
+\pagebreak
+
+\listoffigures
+
+\pagebreak
+
+\listoftables
+
+\pagebreak
+
+%==========================================================================
+% END INDEXES PAGES 
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN INTRODUCTION
+%==========================================================================
+
+%% Starting page numbering here
+\pagenumbering{arabic}
+
+\chapter{Introdução}
+    <<Este primeiro capítulo deverá ter obrigatoriamente as subsecções abaixo apresentadas.>>
+    \section{Contextualização}
+        <<Nesta secção deverá ser apresentado o contexto no qual se desenvolve o caso de estudo seleccionado.>>
+    \section{Apresentação do Caso de Estudo}
+        <<Esta secção acolherá uma descrição concisa do caso de estudo seleccionado.>>
+    \section{Motivação e Objectivos}
+        <<Esta secção acolherá os diversos motivos, acompanhados por uma breve descrição, que conduziram à proposta e ao desenvolvimento do trabalho, assim como a apresentação detalhada dos diversos objectivos a alcançar com a sua realização.>>
+    \section{Estrutura do Relatório}
+        <<Após a leitura da introdução de um relatório é "simpático" apresentar uma breve descrição daquilo que se vai encontrar nos demais capítulos do relatório.>>
+
+%==========================================================================
+% END INTRODUCTION
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN SUGESTÕES PARA ESCRITA DO RELATÓRIO
+%==========================================================================
+
+\chapter{Sugestões para Escrita do Relatório}
+
+    \section{Sugestões Gerais}
+        <<O presente documento deverá servir de base para a escrita do relatório do trabalho realizado.>>\\
+
+        <<O tipo de letra a utilizar deverá ser Arial.. Porém recomenda-se em situações de escrita de excertos de programas a utilização do tipo de letra Courier New.>>\\
+
+        << Alguns estilos documento: Heading1, Heading2, Heading3, Normal e Footnote Text; foram especialmente modificados para os relatórios da presente disciplina.>>\\
+
+        <<Os formatos e estilos de letra não devem estar constantemente a ser modificados ao longo do relatório. Tal situação dará origem a um relatório com um formato e apresentação muito heterogénea e com um aspecto pouco consistente.>>
+    \section{Termos Estrangeiros}
+        <<Os termos estrangeiros utilizados deverão ser apresentados num formato diferente do resto do texto, por exemplo: Data Warehouse (em itálico) ou "Data Warehouses" (entre aspas), devendo ser evitados sempre que se conheça uma tradução correcta para português. Para validação desses termos existem vários dicionários no mercado que poderão ser úteis.>>
+    \section{Tabelas e Figuras}
+        <<Caso seja necessário introduzir figuras ou tabelas no corpo do documento, estas devem seguir os formatos que se apresentam de seguida. Qualquer figura ou tabela deverá ter uma legenda associada, devendo esta estar correctamente apresentada no índice respectivo no início do relatório.>>
+        
+
+         \begin{figure}[!h]
+            \centering
+            \includegraphics[scale=0.7]{images/example.png}
+            \caption{Ilustração de inserção de uma figura e legenda.}
+         \end{figure}
+        
+        \vspace*{0.2cm}
+        
+        \begin{table}[!h]
+            \centering
+            \begin{tabular}{|p{2cm}|p{2cm}|p{2cm}|p{2cm}|p{2cm}|}
+               \hline
+               \rowcolor{gray!20!white}
+                Coluna1 & Coluna2 & Coluna3 & & ColunaN \\
+                \hline
+                        &         &         & &         \\
+                \hline
+                        &         &         & &         \\
+                \hline
+                        &         &         & &         \\
+                \hline
+                        &         &         & &         \\
+                \hline
+                        &         &         & &         \\
+                \hline
+            \end{tabular}
+            \caption{Ilustração de inserção de uma tabela e sua legenda.}
+        \end{table}
+        
+        
+    \section{Siglas e Acrónimos}
+        <<A utilização de siglas ou acrónimos deverão, tal como os termos estrangeiros, ser feita com base no seguinte formato: Bases de Dados (BD). Todas as siglas e acrónimos deverão ser apresentadas numa secção própria, no início (a seguir aos índices) ou no final (a seguir ao capítulo das conclusões e trabalho futuro) do relatório.
+    \section{Referências Bibliográficas}
+        <<A forma de apresentação das referências bibliográficas deverão estar de acordo com as regras definidas pela IEEE. Consultar www.ieee.org>>
+    \section{Tipo de Ficheiro}
+        <<O relatório poderá ser enviado para o regente da disciplina por correio electrónico num dos seguintes formatos: html, word ou pdf>>
+   
+        
+%==========================================================================
+% END SUGESTÕES PARA ESCRITA DO RELATÓRIO
+%==========================================================================
+
+%==========================================================================
+% BEGIN CONCLUSÕES DE TRABALHO FUTURO
+%==========================================================================
+
+\chapter{Conclusões e Trabalho Futuro}
+    <<Elaborar uma apreciação crítica sobre o trabalho realizado, apontando os seus pontos fortes e fracos. Adicionalmente, caso se aplique, enunciar eventuais tarefas a realizar futuramente ou novas opções para estender o trabalho realizado.>>
+
+
+%==========================================================================
+% END CONCLUSÕES DE TRABALHO FUTURO
+%==========================================================================
+
+%==========================================================================
+% BEGIN REFERÊNCIAS
+%==========================================================================
+
+%% Changes biblibography name
+%% Portuguese babel default : "Bibliografia"
+%% Personally I prefer "Referências"
+\renewcommand\bibname{Referências}
+
+%% https://www.overleaf.com/learn/latex/bibliography_management_with_bibtex
+\begin{thebibliography}{9}
+<<Apresentar a lista de referências bibliográficas referidas ao longo do relatório; recomenda-se a utilização do formato Harvard - http://libweb.anglia.ac.uk/referencing/harvard.htm>>
+\end{thebibliography}
+
+
+%==========================================================================
+% END REFERÊNCIAS
+%==========================================================================
+
+%==========================================================================
+% BEGIN LISTA DE SIGLAS E ACRÓNIMOS
+%==========================================================================
+
+%% Portuguese babel does not translate this environment
+\renewcommand{\nomname}{Lista de Siglas e Acrónimos}
+
+%% Text that can be shown before acronyms list
+\renewcommand{\nompreamble}{<<Apresentar uma lista com todas as siglas e acrónimos utilizados durante a realização do trabalho. O formato base para esta lista deverá ser da forma como abaixo se apresenta.>>}
+
+%% acronyms
+\nomenclature[01]{\textbf{BD}}{Base de Dados}
+\nomenclature[02]{DW}{Data Warehouse}
+\nomenclature[03]{OLTP}{On-Line Analytical Processing}
+\nomenclature[04]{...}{...}
+
+%% Show acronyms
+\printnomenclature
+
+
+
+%==========================================================================
+% END LISTA DE SIGLAS E ACRÓNIMOS
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN ANEXOS
+%==========================================================================
+
+%% Why \addchap, instead of \chapter? 
+%% \addchap has no numbering but appears in table of contents.
+\addchap{Anexos}
+
+    <<Os anexos deverão ser utilizados para a inclusão de informação adicional necessária para uma melhor compreensão do relatório o para complementar tópicos, secções ou assuntos abordados. Os anexos criados deverão ser numerados e possuir uma designação. Estes dados permitirão complementar o Índice geral do relatório relativamente à enumeração e apresentação dos diversos anexos.>>
+    
+    %% section version of \addchap
+    \addsec{Anexo 1}
+
+
+%==========================================================================
+% END ANEXOS
+%==========================================================================
+\end{document}
