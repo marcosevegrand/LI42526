@@ -1,0 +1,16 @@
+
+\begin{thenomenclature} 
+\nomgroup{Symbols}
+  \item [{\textbf{API}}]\begingroup Application Programming Interface\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{IVA}}]\begingroup Imposto sobre o Valor Acrescentado\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{LLM}}]\begingroup Large Language Model\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{MVP}}]\begingroup Minimum Viable Product\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{OS}}]\begingroup Ordem de Serviço\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{RBAC}}]\begingroup Role-Based Access Control\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{RF}}]\begingroup Requisito Funcional\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{RGPD}}]\begingroup Regulamento Geral sobre a Proteção de Dados\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{RNF}}]\begingroup Requisito Não Funcional\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{SRS}}]\begingroup Software Requirements Specification\nomeqref {0.0}\nompageref{1}
+  \item [{\textbf{UML}}]\begingroup Unified Modeling Language\nomeqref {0.0}\nompageref{1}
+
+\end{thenomenclature}

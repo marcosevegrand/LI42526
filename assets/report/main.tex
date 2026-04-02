@@ -1,0 +1,855 @@
+\documentclass[a4paper,12pt]{scrreprt}
+    %% Used for changing geometry of the page
+    %% Cover page text cannot overlay cover sketching/style 
+    %% https://ctan.org/pkg/geometry?lang=en
+\usepackage{geometry}
+    %% Changes language of some packages protocols
+    %% e.g., when captioning images: Figure 1. -> Figura 1.
+    %% https://ctan.org/pkg/babel?lang=en
+\usepackage[portuguese]{babel}
+    %% Used for special fonts
+    %% Cannot be compiled with pdflatex
+    %% https://ctan.org/pkg/fontspec?lang=en
+\usepackage{fontspec}
+    %% Arial FONT
+    \IfFontExistsTF{Arial}{\setmainfont{Arial}}{\setmainfont{Liberation Sans}}
+
+    %% More colors and color options
+    %% https://ctan.org/pkg/xcolor?lang=en
+    %% https://ctan.org/pkg/colortbl?lang=en
+\usepackage{xcolor,colortbl}
+    %% More tabular options, like dashed/dotted lines
+    %% https://ctan.org/pkg/arydshln?lang=en
+\usepackage{arydshln}
+    %% List of acronyms
+    %% https://ctan.org/pkg/nomencl?lang=en
+\usepackage[intoc]{nomencl}
+    %% Must be called to init nomencl environment  
+    \makenomenclature
+    %% More images options/settings
+    %% https://ctan.org/pkg/graphicx?lang=en
+\usepackage{graphics}
+    %% Defining subdirectories to image path enviornment
+    %% \graphicspath{{sub1}{sub2}...{subN}}
+    \graphicspath{{images/}}
+    
+    %% used to handle cross-referencing commands in LaTeX to produce hypertext links in the document
+    %% https://ctan.org/pkg/hyperref?lang=en
+\usepackage{hyperref}
+    %% math environments
+    %% https://ctan.org/pkg/amsmath?lang=en
+
+    %% settings
+    \hypersetup{
+        colorlinks,
+        citecolor=black,
+        filecolor=black,
+        linkcolor=black,
+        urlcolor=black
+    }
+
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{float}
+    %% Defining backgrouns, used to make the cover
+    %% https://ctan.org/pkg/background?lang=en
+\usepackage[some]{background}
+    %% Used to make drawings or complex graphics
+    %% http://pgf.sourceforge.net/pgf_CVS.pdf
+\usepackage{tikz}
+    %% Tikz library to point operations ((x1,y1) + (x2,y2))
+    \usetikzlibrary{calc}
+
+%% Defining sfdefault font and default font for document
+\renewcommand{\familydefault}{\sfdefault}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\setlength{\LTpre}{0pt}
+\setlength{\LTpost}{0pt}
+
+
+%% Costume made cover 
+%% From there you can use \makecover command to build the cover
+\input{cover}
+
+%==========================================================================
+% DOCUMENT
+%==========================================================================
+
+\begin{document}
+
+\pagenumbering{gobble}
+
+% builds the cover
+\makecover
+
+%% smaller footer and header size
+\newgeometry{top=3cm,left=3cm,right=3cm,bottom=4cm}
+
+%==========================================================================
+% BEGIN OPCIONAL DEDICATÓRIA
+%==========================================================================
+
+\clearpage
+\begin{center}
+    \thispagestyle{empty}
+    \vspace*{\fill}
+    
+    $<<$/opcional Dedicatória$>>$
+    
+    \vspace*{\fill}
+\end{center}
+\clearpage
+
+%==========================================================================
+% END OPCIONAL DEDICATÓRIA
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN ABSTRACT PAGE
+%==========================================================================
+
+
+
+%% Abstract name: \Large font size, flushed left and paragraph skip before abstract content
+\renewenvironment{abstract}
+ {\par\noindent\textbf{\Large\abstractname}\par\bigskip}
+ {}
+
+\begin{flushleft}
+\begin{abstract}
+    O presente relatório documenta a fase de conceção e engenharia de requisitos do projeto \textit{Sistema de Gestão para as Oficinas Gengis Khan}, desenvolvido no âmbito da unidade curricular de Laboratórios de Informática IV. O problema em estudo incide sobre a digitalização de uma oficina especializada na reparação de trotinetes elétricas, cuja operação corrente assenta ainda em cadernos, folhas avulsas e ficheiros Excel dispersos. Esta fragmentação compromete a rastreabilidade das ordens de serviço, a fiabilidade da faturação, o controlo de stock e a capacidade de suporte à decisão.
+
+    Partindo do enunciado da unidade curricular e de um processo sistemático de levantamento de informação, procedeu-se à caracterização do domínio, à identificação dos stakeholders, à análise de contexto e restrições, à avaliação de viabilidade, à definição dos objetivos do sistema e à formalização dos principais artefactos da engenharia de requisitos. Para esse efeito, foram consideradas entrevistas semiestruturadas com os intervenientes da oficina, análise de registos físicos de operação e consolidação iterativa de \textit{user stories}, requisitos funcionais, requisitos não funcionais e regras de negócio. O resultado obtido consiste num corpo documental coerente e rastreável que delimita o âmbito do sistema, descreve os seus processos nucleares e estabelece uma base sólida para as etapas seguintes de arquitetura, desenho e implementação.
+
+    Em termos de estado final, este relatório entrega uma visão estruturada e profissional da solução a desenvolver, com ênfase na centralização de dados, na gestão do ciclo de vida das ordens de serviço, no controlo de inventário, na faturação conforme as obrigações legais e na comunicação com clientes. O documento encerra a fase inicial do projeto com um nível de especificação adequado à transição para a modelação arquitetural e para a implementação assistida por LLM, conforme preconizado no enunciado de LI4.
+    \par \textbf{Área de Aplicação}: Engenharia de Software e Sistemas de Informação para gestão operacional de oficinas de reparação de trotinetes elétricas.
+    \par \textbf{Palavras-Chave}: Engenharia de Requisitos, LLM, SRS, Ordens de Serviço, Gestão de Stock, Faturação, RGPD, Oficina de Reparação, Micromobilidade.
+\end{abstract}
+\end{flushleft}
+
+
+\pagebreak
+
+%==========================================================================
+% END ABSTRACT PAGE 
+%==========================================================================
+
+%==========================================================================
+% BEGIN INDEXES PAGES
+%==========================================================================
+
+%% Changes table of content name
+%% Portuguese babel default : "Conteúdo"
+%% Personally I prefer "índice"
+\renewcommand{\contentsname}{Índice}
+
+\tableofcontents
+
+\pagebreak
+
+\listoftables
+
+\pagebreak
+
+%% Portuguese babel does not translate this environment
+\renewcommand{\nomname}{Lista de Siglas e Acrónimos}
+
+%% Text that can be shown before acronyms list
+\renewcommand{\nompreamble}{Lista das principais siglas e acrónimos utilizados ao longo do relatório.}
+
+\nomenclature[01]{\textbf{API}}{Application Programming Interface}
+\nomenclature[02]{\textbf{IVA}}{Imposto sobre o Valor Acrescentado}
+\nomenclature[03]{\textbf{LLM}}{Large Language Model}
+\nomenclature[04]{\textbf{MVP}}{Minimum Viable Product}
+\nomenclature[05]{\textbf{OS}}{Ordem de Serviço}
+\nomenclature[06]{\textbf{RBAC}}{Role-Based Access Control}
+\nomenclature[07]{\textbf{RF}}{Requisito Funcional}
+\nomenclature[08]{\textbf{RGPD}}{Regulamento Geral sobre a Proteção de Dados}
+\nomenclature[09]{\textbf{RNF}}{Requisito Não Funcional}
+\nomenclature[10]{\textbf{SRS}}{Software Requirements Specification}
+\nomenclature[11]{\textbf{UML}}{Unified Modeling Language}
+
+\printnomenclature
+
+\pagebreak
+
+%==========================================================================
+% END INDEXES PAGES 
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN INTRODUCTION
+%==========================================================================
+
+%% Starting page numbering here
+\pagenumbering{arabic}
+
+\chapter{Introdução}
+    \section{Contextualização}
+        A mobilidade urbana europeia atravessa uma transformação estrutural, marcada pela crescente adoção de soluções de micromobilidade como as trotinetes elétricas. Esta evolução, impulsionada por preocupações ambientais, pela necessidade de reduzir tempos de deslocação e por políticas municipais de descarbonização, tem produzido um novo ecossistema de serviços de manutenção e pós-venda. Neste contexto, oficinas especializadas em diagnóstico e reparação de trotinetes enfrentam desafios operacionais que combinam eletrónica, mecânica e gestão administrativa.
+
+        As Oficinas Gengis Khan inserem-se neste setor emergente. A oficina presta serviços a clientes particulares e empresariais, lidando com múltiplas marcas, diferentes fornecedores de peças e um volume crescente de ordens de serviço. Embora o trabalho técnico realizado sobre os equipamentos seja cada vez mais exigente, os processos administrativos e de controlo continuam maioritariamente assentes em suportes manuais, o que origina perda de informação, atrasos, erros de cálculo e fraca visibilidade sobre o estado das reparações.
+
+        O enunciado da unidade curricular de Laboratórios de Informática IV propõe precisamente a resolução de problemas desta natureza através de uma abordagem assistida por LLM ao longo do ciclo de vida de desenvolvimento de software. Assim, o presente projeto enquadra-se na Etapa 1 do trabalho prático, centrando-se na conceção do sistema e na engenharia de requisitos para um sistema de gestão de oficina de reparação de trotinetes.
+    \section{Apresentação do Caso de Estudo}
+        O caso de estudo selecionado corresponde ao Tema 3 do enunciado: um sistema de gestão para uma oficina de reparação de trotinetes. O sistema deverá apoiar o registo de clientes e equipamentos, a criação e evolução de ordens de serviço, o controlo do processo de diagnóstico e reparação, a gestão de peças e fornecedores, a faturação dos serviços prestados e a geração de relatórios técnicos e financeiros.
+
+        No cenário atual, a oficina utiliza cadernos de operações, folhas de ordem de serviço, tabelas de stock e faturação em Excel. Embora estes instrumentos permitam manter a operação em funcionamento, não garantem rastreabilidade, consistência nem uma capacidade analítica suficiente para suportar o crescimento projetado do negócio. O sistema a desenvolver surge, por isso, como uma plataforma centralizada que pretende substituir este modelo informal por uma solução robusta, auditável e escalável.
+    \section{Motivação e Objectivos}
+        A motivação central deste trabalho reside na necessidade de digitalizar processos críticos da oficina, assegurando a integridade e a rastreabilidade dos dados operacionais. Problemas como a fragmentação de informação, a dificuldade em recuperar o histórico de um equipamento, a gestão reativa do stock e a faturação manual tornam-se especialmente graves quando o volume de serviço aumenta e quando os requisitos legais, como a numeração sequencial de faturas e a proteção de dados pessoais, têm de ser garantidos sem margem para erro.
+
+        O objetivo geral do projeto consiste em definir, com rigor suficiente para suportar as etapas seguintes do desenvolvimento, um sistema de gestão integrado para a oficina. Desse objetivo geral decorrem objetivos específicos: centralizar clientes, equipamentos, ordens de serviço e peças numa base de dados única; formalizar o ciclo de vida da reparação com estados e transições controladas; automatizar cálculos e movimentos de stock; suportar a conformidade fiscal e regulamentar; e disponibilizar informação de gestão relevante para a tomada de decisão.
+
+        Um objetivo transversal igualmente importante consiste em explorar o uso de LLM como instrumentos de apoio à engenharia de software, sem abdicar da validação crítica por parte da equipa de desenvolvimento. Neste sentido, o relatório reflete não apenas a definição do sistema, mas também a preocupação metodológica com a qualidade dos artefactos produzidos.
+    \section{Estrutura do Relatório}
+        O relatório encontra-se organizado em sete capítulos principais. Após a introdução, o Capítulo 2 apresenta a conceção do sistema, incluindo a contextualização do domínio, a fundamentação, os objetivos e o modelo conceptual do problema. O Capítulo 3 identifica os stakeholders e explicita o contexto de negócio, as restrições e as dependências relevantes. O Capítulo 4 avalia a viabilidade do projeto e sistematiza os recursos, a equipa e o plano de execução.
+
+        O Capítulo 5 documenta a fase de engenharia de requisitos, incluindo a metodologia de elicitação, as \textit{user stories}, a listagem consolidada de requisitos e a resolução de ambiguidades. O Capítulo 6 encerra o relatório com uma apreciação crítica do trabalho realizado e com a identificação de trabalho futuro. Por fim, incluem-se referências bibliográficas, siglas e anexos com sínteses das evidências recolhidas durante o estudo do domínio.
+
+%==========================================================================
+% END INTRODUCTION
+%==========================================================================
+
+
+%==========================================================================
+% BEGIN SUGESTÕES PARA ESCRITA DO RELATÓRIO
+%==========================================================================
+
+\chapter{Conceção do Sistema e Definição do Domínio}
+
+    \section{Fundamentação}
+        A proposta de desenvolvimento do sistema fundamenta-se num diagnóstico estruturado aos processos de negócio da oficina, realizado com base em entrevistas e análise documental. Este diagnóstico permitiu identificar quatro fragilidades centrais: fragmentação e perda de informação, opacidade operacional sobre o estado das reparações, gestão reativa do aprovisionamento e insuficiente rigor financeiro e comunicacional.
+
+        A ausência de um repositório centralizado faz com que dados sobre clientes, trotinetes, intervenções e faturação permaneçam dispersos por múltiplos suportes. Como consequência, o histórico de um equipamento não é facilmente recuperável, a consulta de informação depende frequentemente da memória dos colaboradores e os processos de decisão são executados com base em estimativas ou cruzamentos manuais de dados. Esta situação é incompatível com o crescimento desejado da oficina e com a necessidade de prestar um serviço mais previsível, fiável e auditável.
+
+        A intervenção tecnológica proposta procura, portanto, substituir um sistema informal por uma plataforma unificada, desenhada sobre processos já existentes mas reforçada com mecanismos de rastreabilidade, automação e análise. O objetivo não consiste em alterar radicalmente a forma como a oficina trabalha, mas sim em suportar essa atividade com melhores instrumentos de registo, controlo e apoio à decisão.
+
+    \section{Objetivos do Projeto}
+        A definição dos objetivos desempenha um papel essencial no ciclo de vida do desenvolvimento de software, uma vez que estabelece critérios claros de orientação para a modelação, para a arquitetura e para a futura validação do sistema. Com base na informação recolhida junto dos stakeholders, os objetivos do projeto foram organizados em três níveis: primários, secundários e transversais.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.3cm}|p{8cm}|p{5cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Objetivo Primário} & \textbf{Indicador de Sucesso} \\
+                \hline
+                O1 & Centralizar clientes, equipamentos, ordens de serviço, intervenções e peças numa base de dados relacional única. & Eliminação de registos dispersos em papel e Excel para operações correntes. \\
+                \hline
+                O2 & Implementar o ciclo de vida completo da ordem de serviço com estados e registo temporal automático. & Consulta do estado e histórico de qualquer OS em menos de 15 segundos. \\
+                \hline
+                O3 & Registar cada intervenção com descrição, mecânico, peças consumidas e tempo de execução. & 100\% das intervenções documentadas com dados mínimos completos. \\
+                \hline
+                O4 & Atualizar automaticamente o stock ao associar peças a intervenções. & Ruturas de stock passam a ser sinalizadas antes de bloquearem a reparação. \\
+                \hline
+                O5 & Gerar faturas automaticamente a partir de ordens de serviço concluídas. & Emissão de fatura em menos de 1 minuto, com numeração sequencial e cálculo automático. \\
+                \hline
+            \end{tabular}
+            \caption{Objetivos primários do projeto}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.3cm}|p{8cm}|p{5cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Objetivo Secundário} & \textbf{Indicador de Sucesso} \\
+                \hline
+                O6 & Automatizar notificações por email ao cliente em momentos relevantes do ciclo de reparação. & Redução substancial dos contactos telefónicos iniciados pela oficina. \\
+                \hline
+                O7 & Disponibilizar \textit{dashboard} analítico com indicadores financeiros e operacionais. & O gerente consegue responder a questões de gestão sem cálculos manuais. \\
+                \hline
+                O8 & Suportar gestão diferenciada de clientes empresariais, crédito e faturas pendentes. & Controlo sistemático de pagamentos a 30 dias. \\
+                \hline
+                O9 & Gerir fornecedores e encomendas com histórico e rastreabilidade. & Maior previsibilidade no reabastecimento de peças críticas. \\
+                \hline
+                O10 & Garantir conformidade com as regras de proteção de dados. & Tratamento de dados pessoais alinhado com os princípios do RGPD. \\
+                \hline
+            \end{tabular}
+            \caption{Objetivos secundários do projeto}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.3cm}|p{8cm}|p{5cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Objetivo Transversal} & \textbf{Indicador de Sucesso} \\
+                \hline
+                O11 & Garantir escalabilidade operacional para a evolução de cerca de 150 para 500 ordens de serviço por mês. & O modelo funcional e técnico mantém-se adequado ao crescimento esperado. \\
+                \hline
+            \end{tabular}
+            \caption{Objetivo transversal do projeto}
+        \end{table}
+
+    \section{Definição do Domínio}
+        O domínio de aplicação do sistema é o da gestão integrada de uma oficina de reparação de trotinetes elétricas. Trata-se de um domínio híbrido, onde coexistem processos administrativos, operações técnicas e obrigações legais. O sistema deve capturar esta realidade sem a simplificar em excesso, garantindo que a modelação de dados e processos representa fielmente a forma como a oficina trabalha no terreno.
+
+        As entidades nucleares identificadas são: Cliente, Trotinete, Ordem de Serviço, Diagnóstico, Intervenção, Peça, Fornecedor, Encomenda, Fatura e Utilizador do Sistema. Um cliente pode ser particular ou empresarial; uma trotinete pertence a um cliente e é identificada de forma inequívoca pelo número de série; uma ordem de serviço agrega o problema reportado, o diagnóstico, as intervenções executadas, o estado da reparação e a eventual fatura associada; cada intervenção pode consumir uma ou mais peças; e cada peça está associada a um fornecedor e a regras de stock mínimo.
+
+        Esta modelação do domínio não é arbitrária. Resulta da extração sistemática de conceitos e relações a partir das entrevistas realizadas e da observação dos registos físicos usados atualmente pela oficina. A estrutura obtida serve, por isso, como ponte entre a realidade do negócio e as decisões técnicas que serão tomadas nas fases de arquitetura e implementação.
+
+    \section{Âmbito Funcional do Sistema}
+        O âmbito do sistema estrutura-se em cinco blocos funcionais principais:
+
+        \begin{enumerate}
+            \item Gestão de clientes e equipamentos, incluindo histórico por NIF e por número de série.
+            \item Gestão do ciclo de vida da ordem de serviço, desde a receção até à entrega.
+            \item Gestão de intervenções, tempos de mão de obra, peças utilizadas e movimentos de stock.
+            \item Faturação, controlo de pagamentos e conformidade com regras fiscais aplicáveis.
+            \item Relatórios, alertas e notificações de suporte à gestão e à comunicação com clientes.
+        \end{enumerate}
+
+        Permanecem fora do âmbito imediato funcionalidades como integração direta com plataformas externas de faturação certificada, portais de self-service para clientes, integração com SMS em produção ou módulos avançados de business intelligence. Estes aspetos podem ser considerados em trabalho futuro, mas não são críticos para a primeira versão funcional do sistema.
+
+    \section{Modelo Conceptual}
+        A análise do domínio evidencia uma cadeia de rastreabilidade contínua: o cliente entrega uma trotinete; a oficina abre uma ordem de serviço; o mecânico executa diagnóstico e intervenções; as peças utilizadas originam movimentos de stock; e a reparação concluída gera um documento de faturação. Este encadeamento lógico constitui o núcleo conceptual do sistema e justifica a centralidade da ordem de serviço como entidade agregadora.
+
+        A escolha deste modelo é particularmente importante porque o sistema atual não garante continuidade entre estas etapas. No modelo manual, a ligação entre a ficha do cliente, o caderno de diagnósticos, a nota sobre peças utilizadas e a fatura final depende de registos dispersos ou da memória dos intervenientes. Ao formalizar estas relações num único sistema de informação, torna-se possível recuperar o histórico de qualquer reparação e medir, com rigor, o desempenho da oficina.
+
+\chapter{Stakeholders, Contexto e Restrições}
+
+    \section{Stakeholders Identificados}
+        A identificação rigorosa dos stakeholders é fundamental para assegurar que o sistema contempla diferentes perspetivas de uso, responsabilidade e decisão. No caso das Oficinas Gengis Khan, distinguem-se stakeholders diretos, indiretos, técnicos e regulamentares.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{3.2cm}|p{5.5cm}|p{2.4cm}|p{4.3cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Stakeholder} & \textbf{Papel Principal} & \textbf{Influência} & \textbf{Interesse no Sistema} \\
+                \hline
+                António Silva (Gerente) & Gestão estratégica, faturação, fornecedores, parametrização e validação de requisitos. & Elevada & Visibilidade operacional, conformidade legal, controlo financeiro. \\
+                \hline
+                Ricardo Costa e Miguel Abrantes (Mecânicos) & Operação diária, diagnósticos, intervenções, atualização de estados e uso intensivo da aplicação. & Média/Alta & Rapidez de registo, rastreabilidade técnica, apoio ao trabalho de bancada. \\
+                \hline
+                Clientes particulares & Beneficiários indiretos das notificações e da transparência da reparação. & Baixa & Informação clara, rapidez e previsibilidade do serviço. \\
+                \hline
+                Clientes empresariais & Clientes com condições comerciais específicas e maior sensibilidade a controlo de crédito. & Média & Gestão de faturas pendentes, histórico consolidado e relatórios. \\
+                \hline
+                Fornecedores & Entidades externas que recebem encomendas e suportam o aprovisionamento. & Baixa & Comunicação clara e estruturada das encomendas. \\
+                \hline
+                Equipa LI4 & Responsável pela análise, desenho, implementação e validação do sistema. & Média & Requisitos claros, âmbito controlado e rastreabilidade documental. \\
+                \hline
+                Docente orientador & Supervisão académica e validação metodológica. & Elevada & Qualidade dos artefactos, cumprimento do enunciado e rigor técnico. \\
+                \hline
+                Autoridade Tributária e CNPD & Enquadramento fiscal e de proteção de dados. & Elevada & Cumprimento de restrições legais não negociáveis. \\
+                \hline
+            \end{tabular}
+            \caption{Stakeholders e respetivo posicionamento no projeto}
+        \end{table}
+
+    \section{Matriz de Gestão de Stakeholders}
+        A diversidade de interesses e níveis de influência obriga à adoção de estratégias diferenciadas de comunicação e validação. A Tabela seguinte sintetiza a abordagem definida para a gestão das partes interessadas.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{4cm}|p{9.5cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Stakeholder} & \textbf{Estratégia de Gestão} \\
+                \hline
+                Gerente & Envolvimento contínuo em sessões de validação e decisões de priorização. \\
+                \hline
+                Mecânicos & Testes de usabilidade e validação iterativa dos fluxos operacionais. \\
+                \hline
+                Clientes empresariais & Consideração dos requisitos específicos de faturação e crédito, sem desviar o foco do MVP. \\
+                \hline
+                Fornecedores & Monitorização indireta através da qualidade do fluxo de encomendas. \\
+                \hline
+                Docente orientador & Alinhamento regular com os objetivos pedagógicos da unidade curricular. \\
+                \hline
+                Entidades regulamentares & Tratamento das respetivas obrigações como restrições de projeto e de arquitetura. \\
+                \hline
+            \end{tabular}
+            \caption{Matriz de gestão de stakeholders}
+        \end{table}
+
+    \section{Contexto de Negócio}
+        As Oficinas Gengis Khan são uma PME especializada em reparação e manutenção de trotinetes elétricas. A oficina atende tanto clientes particulares como entidades empresariais com pequenas frotas, o que introduz diferentes perfis de serviço, regras de pagamento e necessidades de acompanhamento. O volume atual situa-se em cerca de 150 ordens de serviço mensais, com uma projeção de crescimento para 500, o que impõe desde logo uma preocupação com escalabilidade funcional e organizacional.
+
+        O negócio combina dois eixos críticos. O primeiro é o eixo técnico: diagnósticos, substituição de componentes, gestão de avarias, tempos de intervenção e controlo da qualidade do serviço prestado. O segundo é o eixo administrativo: registo de clientes, gestão de stock, comunicação com fornecedores, faturação e acompanhamento de pagamentos. O sistema a desenvolver deve integrar ambos, sem sacrificar a rapidez da operação diária.
+
+    \section{Restrições Legais, Técnicas e Académicas}
+        O projeto encontra-se sujeito a um conjunto de restrições que delimitam o espaço de solução aceitável.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{2.2cm}|p{11.8cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Tipo} & \textbf{Restrição} \\
+                \hline
+                LEGAL & A faturação deve respeitar numeração sequencial contínua e sem quebras, em conformidade com as obrigações fiscais aplicáveis. \\
+                \hline
+                LEGAL & O tratamento de dados pessoais deve obedecer aos princípios do RGPD, incluindo minimização, controlo de acessos e capacidade de retificação. \\
+                \hline
+                TÉCNICA & O sistema deve ser uma aplicação web responsiva, acessível a partir da oficina e remotamente pelo gerente. \\
+                \hline
+                TÉCNICA & A aplicação deve funcionar adequadamente em tablets, dado o contexto de uso em bancada. \\
+                \hline
+                TÉCNICA & Devem existir perfis de acesso distintos para gerente e mecânicos, segundo um modelo RBAC simples. \\
+                \hline
+                TÉCNICA & O sistema deve garantir backups automáticos diários e preservar a integridade dos dados críticos. \\
+                \hline
+                ACADÉMICA & O desenvolvimento decorre no contexto temporal do semestre de LI4, com uma fase de implementação limitada e necessidade de priorizar um MVP. \\
+                \hline
+                ACADÉMICA & O uso de LLM deve ser assistido e criticamente supervisionado pela equipa de desenvolvimento, em linha com o enunciado da unidade curricular. \\
+                \hline
+            \end{tabular}
+            \caption{Restrições do projeto}
+        \end{table}
+
+    \section{Suposições e Dependências}
+        Para além das restrições identificadas, o projeto assenta em algumas suposições e dependências operacionais:
+
+        \begin{itemize}
+            \item \textbf{[ASSUNÇÃO]} Os stakeholders-chave manter-se-ão disponíveis para sessões de validação ao longo do semestre.
+            \item \textbf{[ASSUNÇÃO]} A oficina continuará a operar com um número reduzido de utilizadores internos, tornando desnecessário um modelo de permissões mais complexo na primeira versão.
+            \item \textbf{[DEPENDÊNCIA]} O envio de notificações por email depende da disponibilidade de um serviço SMTP utilizável pela aplicação.
+            \item \textbf{[DEPENDÊNCIA]} A adequação da aplicação a tablets depende da qualidade da interface produzida e dos testes de usabilidade realizados com os mecânicos.
+        \end{itemize}
+
+\chapter{Viabilidade, Recursos e Plano de Execução}
+
+    \section{Viabilidade do Projeto}
+        A análise de viabilidade foi conduzida nas dimensões técnica, organizacional, económica e temporal, com o objetivo de verificar se o sistema proposto é realizável e justificado no contexto do projeto.
+
+        \subsection{Viabilidade Técnica}
+        Do ponto de vista técnico, a solução proposta não exige tecnologia experimental. Uma arquitetura web em camadas, suportada por uma base de dados relacional e por mecanismos correntes de autenticação, registo e notificação, é suficiente para cobrir os requisitos identificados. O volume de dados esperado, mesmo considerando crescimento para 500 ordens de serviço por mês, é perfeitamente compatível com tecnologias consolidadas como PostgreSQL e uma API desenvolvida em C\#.
+
+        \subsection{Viabilidade Organizacional}
+        A predisposição dos stakeholders para a mudança é um dos principais fatores favoráveis ao projeto. Tanto o gerente como o mecânico-chefe demonstraram consciência dos problemas atuais e abertura para a adoção de uma solução digital, desde que esta respeite os fluxos de trabalho reais da oficina e não imponha burocracia excessiva à operação diária.
+
+        \subsection{Viabilidade Económica}
+        A viabilidade económica assenta sobretudo na redução de ineficiências: menor probabilidade de erro na faturação, maior previsibilidade no reabastecimento de peças, melhor controlo de crédito e menor esforço administrativo por ordem de serviço. Num contexto académico, os custos de desenvolvimento não recaem diretamente sobre a oficina, o que torna a relação custo-benefício particularmente favorável.
+
+        \subsection{Viabilidade Temporal}
+        O principal risco temporal decorre da limitação do calendário académico. Por essa razão, é indispensável distinguir funcionalidades críticas de funcionalidades adiáveis. O MVP deverá concentrar-se em receção, ordens de serviço, intervenções, stock e faturação, deixando para uma fase posterior relatórios avançados, integração mais rica com fornecedores e funcionalidades não bloqueantes.
+
+    \section{Recursos Humanos e Materiais}
+        A concretização do projeto exige a articulação entre conhecimento de negócio e competência técnica. Os recursos humanos e tecnológicos identificados são apresentados nas tabelas seguintes.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{3.3cm}|p{4.5cm}|p{5.9cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Categoria} & \textbf{Responsáveis} & \textbf{Contributo Principal} \\
+                \hline
+                Stakeholders operacionais & António Silva, Ricardo Costa, Miguel Abrantes & Validação do domínio, regras de negócio, fluxos de trabalho e critérios de aceitação. \\
+                \hline
+                Equipa de desenvolvimento & Francisco Martins, Nuno Rebelo, Marco Sèvegrand, Lucas Robertson, Marco Ferreira & Engenharia de requisitos, modelação, arquitetura, implementação, testes e documentação. \\
+                \hline
+                Supervisão académica & Docente da UC LI4 & Enquadramento metodológico e validação académica do processo. \\
+                \hline
+            \end{tabular}
+            \caption{Recursos humanos do projeto}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{4cm}|p{9.7cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Componente} & \textbf{Recurso Previsto} \\
+                \hline
+                Base de dados & PostgreSQL \\
+                \hline
+                Backend & C\# / .NET \\
+                \hline
+                Frontend & TypeScript com React \\
+                \hline
+                Ambiente de execução & Aplicação web responsiva \\
+                \hline
+                Notificações & Serviço SMTP \\
+                \hline
+                Modelação & PlantUML e/ou Visual Paradigm \\
+                \hline
+                Apoio assistido por IA & GitHub Copilot e outros LLM para apoio à produção de artefactos, sempre com validação humana \\
+                \hline
+            \end{tabular}
+            \caption{Recursos tecnológicos e materiais previstos}
+        \end{table}
+
+    \section{Plano de Execução}
+        O projeto segue a estrutura sequencial definida no enunciado da unidade curricular, organizada em quatro etapas principais. Esta abordagem é adequada à necessidade de produzir artefactos formais em cada fase e de assegurar uma passagem controlada entre requisitos, arquitetura, implementação e validação.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1cm}|p{4.2cm}|p{7.8cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Fase} & \textbf{Designação} & \textbf{Atividades Principais} \\
+                \hline
+                1 & Conceção e Engenharia de Requisitos & Definição do domínio, entrevistas, análise documental, user stories, requisitos e SRS. \\
+                \hline
+                2 & Arquitetura e Design & Definição da arquitetura, componentes, diagramas e interfaces. \\
+                \hline
+                3 & Implementação Assistida por LLM & Desenvolvimento incremental do sistema, revisão e refatoração. \\
+                \hline
+                4 & Verificação e Validação & Testes automatizados, análise de cobertura e avaliação de qualidade. \\
+                \hline
+            \end{tabular}
+            \caption{Plano de execução do projeto}
+        \end{table}
+
+\chapter{Engenharia de Requisitos}
+
+    \section{Metodologia de Elicitação e Descoberta}
+        A elicitação de requisitos foi tratada como um processo iterativo de descoberta, e não como uma simples recolha passiva de pedidos. Seguindo uma perspetiva alinhada com Sommerville, recorreu-se a entrevistas semiestruturadas com os stakeholders primários, análise de artefactos físicos da operação corrente e consolidação progressiva das necessidades em user stories e requisitos mais formais.
+
+        A primeira entrevista incidiu sobretudo na compreensão do domínio e no mapeamento do fluxo de trabalho da oficina. A segunda entrevista refinou regras de negócio, prioridades e requisitos operacionais concretos. Complementarmente, a análise do caderno de operações, das folhas de ordem de serviço, de excertos do caderno de stock e de faturas permitiu observar que dados são realmente registados e onde se situam as maiores fragilidades do processo atual.
+
+        A triangulação entre estas fontes permitiu distinguir o que é indispensável para a operação diária do que é apenas desejável a médio prazo. Esse trabalho foi fundamental para produzir uma especificação consistente e adequada ao contexto académico do projeto, evitando scope creep e reduzindo ambiguidades antes da fase de arquitetura.
+
+    \section{User Stories}
+        As user stories foram utilizadas como artefacto intermédio de comunicação com os stakeholders e de estruturação das necessidades segundo a perspetiva de valor para o utilizador. Embora não substituam uma especificação formal, funcionam como ponte entre a linguagem do negócio e a linguagem dos requisitos.
+
+        \subsection{User Stories do Gerente}
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.8cm}|p{10.6cm}|p{2.6cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{User Story} & \textbf{Prioridade} \\
+                \hline
+                US-G01 & Como gerente, pretendo registar e manter clientes particulares e empresariais, para que a faturação e as condições comerciais sejam aplicadas corretamente. & Alta \\
+                \hline
+                US-G02 & Como gerente, pretendo consultar faturas pendentes e atrasadas por cliente, para que possa gerir o risco de tesouraria e acompanhar cobranças. & Alta \\
+                \hline
+                US-G03 & Como gerente, pretendo emitir faturas automaticamente a partir de ordens de serviço concluídas, para que a faturação seja rápida e conforme a lei. & Alta \\
+                \hline
+                US-G04 & Como gerente, pretendo configurar parâmetros como taxa horária e IVA, para que o sistema reflita as condições comerciais em vigor. & Média \\
+                \hline
+                US-G05 & Como gerente, pretendo visualizar quantas ordens de serviço estão em cada estado, para que possa identificar bloqueios e ajustar prioridades. & Alta \\
+                \hline
+                US-G06 & Como gerente, pretendo receber alertas de stock mínimo, para que possa encomendar antecipadamente e evitar ruturas. & Alta \\
+                \hline
+                US-G07 & Como gerente, pretendo criar e enviar encomendas a fornecedores, para que o aprovisionamento seja rastreável. & Média \\
+                \hline
+                US-G08 & Como gerente, pretendo consultar relatórios de faturação, consumo de peças e produtividade, para apoiar a tomada de decisão. & Média \\
+                \hline
+            \end{tabular}
+            \caption{User stories do gerente}
+        \end{table}
+
+        \subsection{User Stories do Mecânico}
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.8cm}|p{10.6cm}|p{2.6cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{User Story} & \textbf{Prioridade} \\
+                \hline
+                US-M01 & Como mecânico, pretendo registar a entrada de uma trotinete e abrir uma OS rapidamente, para que a receção do cliente não seja atrasada por burocracia. & Alta \\
+                \hline
+                US-M02 & Como mecânico, pretendo registar o diagnóstico técnico na OS, para que a causa provável e a solução proposta fiquem documentadas. & Alta \\
+                \hline
+                US-M03 & Como mecânico, pretendo alterar o estado da OS conforme o trabalho progride, para que exista rastreabilidade do processo. & Alta \\
+                \hline
+                US-M04 & Como mecânico, pretendo registar várias intervenções numa OS, para que o trabalho realizado fique detalhado e faturável. & Alta \\
+                \hline
+                US-M05 & Como mecânico, pretendo usar um cronómetro para medir o tempo de intervenção, para que a mão de obra não dependa de estimativas manuais. & Alta \\
+                \hline
+                US-M06 & Como mecânico, pretendo associar peças usadas a uma intervenção, para que o stock seja atualizado e a faturação seja correta. & Alta \\
+                \hline
+                US-M07 & Como mecânico, pretendo consultar o histórico de reparações de uma trotinete pelo número de série, para acelerar diagnósticos futuros. & Média \\
+                \hline
+                US-M08 & Como mecânico, pretendo saber antecipadamente se existem peças disponíveis para uma intervenção, para evitar bloqueios por falta de stock. & Média \\
+                \hline
+            \end{tabular}
+            \caption{User stories dos mecânicos}
+        \end{table}
+
+    \section{Requisitos Funcionais Consolidados}
+        Os requisitos funcionais apresentados de seguida resultam da consolidação das entrevistas, da análise documental e das user stories anteriormente descritas. Foram removidas duplicações, fundidos requisitos sobrepostos e esclarecidas ambiguidades, de modo a obter um conjunto coerente e rastreável de comportamentos que o sistema deve suportar.
+
+        \subsection{Atendimento e Equipamentos}
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.4cm}|p{8.9cm}|p{2.5cm}|p{2.1cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Descrição} & \textbf{Módulo} & \textbf{Prioridade} \\
+                \hline
+                RF-01 & O sistema deve permitir registar clientes com nome completo, NIF, telefone e email obrigatórios e morada opcional. & Atendimento & Alta \\
+                \hline
+                RF-02 & O sistema deve distinguir clientes particulares de clientes empresariais. & Atendimento & Alta \\
+                \hline
+                RF-03 & O sistema deve permitir registar, para clientes empresariais, a denominação social, o limite de crédito e as condições de pagamento. & Atendimento & Alta \\
+                \hline
+                RF-04 & O NIF deve identificar univocamente um cliente, bloqueando registos duplicados. & Atendimento & Alta \\
+                \hline
+                RF-05 & O sistema deve permitir consultar o histórico do cliente, incluindo visitas, valor acumulado e faturas em aberto. & Atendimento & Média \\
+                \hline
+                RF-06 & O sistema deve permitir editar os contactos de clientes e fornecedores após o registo. & Atendimento & Média \\
+                \hline
+                RF-07 & O sistema deve permitir registar cada trotinete com marca, modelo, número de série único e observações de estado geral. & Equipamentos & Alta \\
+                \hline
+                RF-08 & O sistema deve permitir consultar o histórico de reparações de uma trotinete através do número de série. & Equipamentos & Média \\
+                \hline
+            \end{tabular}
+            \caption{Requisitos funcionais consolidados de atendimento e equipamentos}
+        \end{table}
+
+        \subsection{Ordens de Serviço e Reparação}
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.4cm}|p{8.9cm}|p{2.5cm}|p{2.1cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Descrição} & \textbf{Módulo} & \textbf{Prioridade} \\
+                \hline
+                RF-09 & O sistema deve criar ordens de serviço com numeração sequencial, data de entrada e estado inicial Recebida. & OS & Alta \\
+                \hline
+                RF-10 & A criação da OS deve exigir cliente, trotinete e problema reportado, podendo o diagnóstico ser preenchido posteriormente. & OS & Alta \\
+                \hline
+                RF-11 & O sistema deve suportar os estados Recebida, Em Diagnóstico, Aguarda Aprovação do Cliente, Aguarda Peças, Em Reparação, Concluída e Entregue ao Cliente. & OS & Alta \\
+                \hline
+                RF-12 & O sistema deve registar automaticamente data, hora e autor de cada mudança de estado da OS. & OS & Alta \\
+                \hline
+                RF-13 & O estado Entregue ao Cliente deve exigir confirmação do gerente. & OS & Alta \\
+                \hline
+                RF-14 & O sistema deve apresentar um resumo com a quantidade de ordens de serviço por estado. & OS & Alta \\
+                \hline
+                RF-15 & O sistema deve permitir associar múltiplas intervenções a uma mesma ordem de serviço. & Reparação & Alta \\
+                \hline
+                RF-16 & Cada intervenção deve registar descrição, mecânico responsável, tempo e peças utilizadas. & Reparação & Alta \\
+                \hline
+                RF-17 & O sistema deve disponibilizar um cronómetro integrado com iniciar, pausar e parar para o registo do tempo de intervenção. & Reparação & Alta \\
+                \hline
+                RF-18 & O sistema deve registar a data de conclusão, data de entrega e fatura associada a cada OS. & Reparação & Média \\
+                \hline
+            \end{tabular}
+            \caption{Requisitos funcionais consolidados de ordens de serviço e reparação}
+        \end{table}
+
+        \subsection{Stock e Fornecedores}
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.4cm}|p{8.9cm}|p{2.5cm}|p{2.1cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Descrição} & \textbf{Módulo} & \textbf{Prioridade} \\
+                \hline
+                RF-19 & O sistema deve manter um catálogo de peças com referência, descrição, fornecedor, preço de custo, preço de venda, stock atual e stock mínimo. & Stock & Alta \\
+                \hline
+                RF-20 & O sistema deve permitir associar peças a uma intervenção e diminuir automaticamente o stock dessas peças. & Stock & Alta \\
+                \hline
+                RF-21 & O sistema deve registar movimentos de stock com data, origem, variação, saldo e responsável. & Stock & Alta \\
+                \hline
+                RF-22 & O sistema deve apresentar um alerta visual sempre que o stock seja inferior ou igual ao mínimo definido. & Stock & Alta \\
+                \hline
+                RF-23 & O sistema deve gerar uma pré-encomenda com peças abaixo do mínimo e permitir o seu envio ao fornecedor. & Stock & Média \\
+                \hline
+                RF-24 & O sistema deve manter histórico de encomendas por fornecedor, com estado e datas de entrega. & Fornecedores & Média \\
+                \hline
+                RF-25 & O sistema deve manter, para cada fornecedor, nome, email, telefone e condições de pagamento. & Fornecedores & Média \\
+                \hline
+            \end{tabular}
+            \caption{Requisitos funcionais consolidados de stock e fornecedores}
+        \end{table}
+
+        \subsection{Faturação, Relatórios, Segurança e Notificações}
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.4cm}|p{8.9cm}|p{2.5cm}|p{2.1cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Descrição} & \textbf{Módulo} & \textbf{Prioridade} \\
+                \hline
+                RF-26 & O sistema deve calcular o valor da reparação com base nas peças, no tempo de mão de obra e no IVA aplicável. & Faturação & Alta \\
+                \hline
+                RF-27 & O sistema deve gerar automaticamente a fatura a partir de uma ordem de serviço concluída. & Faturação & Alta \\
+                \hline
+                RF-28 & A fatura deve discriminar peças utilizadas, horas de trabalho, subtotal, IVA e total. & Faturação & Alta \\
+                \hline
+                RF-29 & O sistema deve emitir faturas com numeração sequencial contínua, sem quebras. & Faturação & Alta \\
+                \hline
+                RF-30 & O sistema deve permitir parametrizar taxa horária e taxa de IVA. & Faturação & Média \\
+                \hline
+                RF-31 & O sistema deve registar forma de pagamento e estado de pagamento de cada fatura. & Faturação & Alta \\
+                \hline
+                RF-32 & O sistema deve permitir consultar rapidamente faturas pendentes e atrasadas de clientes empresariais. & Faturação & Média \\
+                \hline
+                RF-33 & O sistema deve disponibilizar relatórios filtráveis por período sobre faturação, custos, peças mais utilizadas, avarias frequentes e produtividade. & Relatórios & Média \\
+                \hline
+                RF-34 & O sistema deve suportar login individual por utilizador. & Segurança & Alta \\
+                \hline
+                RF-35 & O sistema deve implementar níveis de acesso distintos para gerente e mecânicos. & Segurança & Alta \\
+                \hline
+                RF-36 & O sistema deve enviar confirmação de receção da trotinete com número de OS e prazo estimado. & Notificações & Média \\
+                \hline
+                RF-37 & O sistema deve enviar pedido de aprovação quando a OS transita para Aguarda Aprovação do Cliente. & Notificações & Média \\
+                \hline
+                RF-38 & O sistema deve notificar o cliente quando a reparação estiver concluída, indicando o valor total. & Notificações & Média \\
+                \hline
+                RF-39 & O sistema deve enviar um aviso de atraso quando uma trotinete permanecer mais de 10 dias em Aguarda Peças. & Notificações & Baixa \\
+                \hline
+                RF-40 & O sistema deve permitir personalizar templates de notificações por email. & Notificações & Baixa \\
+                \hline
+            \end{tabular}
+            \caption{Requisitos funcionais consolidados de faturação, relatórios, segurança e notificações}
+        \end{table}
+
+    \section{Requisitos Não Funcionais Consolidados}
+        Os requisitos não funcionais condicionam a forma como os requisitos funcionais devem ser implementados e avaliados. No presente projeto, estes requisitos incidem sobretudo sobre plataforma, segurança, fiabilidade e escalabilidade.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.6cm}|p{3cm}|p{7.4cm}|p{3.2cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{ID} & \textbf{Categoria} & \textbf{Descrição} & \textbf{Verificação} \\
+                \hline
+                RNF-01 & Plataforma & O sistema deve ser uma aplicação web acessível na oficina e remotamente. & Demonstração funcional em rede local e remota. \\
+                \hline
+                RNF-02 & Usabilidade & O sistema deve funcionar adequadamente em tablets e em contexto de uso oficinal. & Testes de usabilidade com mecânicos. \\
+                \hline
+                RNF-03 & Segurança & O sistema deve proteger os dados pessoais em conformidade com o RGPD. & Verificação de permissões, minimização e políticas de acesso. \\
+                \hline
+                RNF-04 & Fiabilidade & O sistema deve executar backups automáticos diários. & Configuração e teste de recuperação básica. \\
+                \hline
+                RNF-05 & Escalabilidade & O sistema deve suportar o volume atual e o crescimento previsto até 500 OS/mês. & Testes de carga representativos e análise de desenho. \\
+                \hline
+            \end{tabular}
+            \caption{Requisitos não funcionais consolidados}
+        \end{table}
+
+    \section{Resolução de Ambiguidades}
+        A análise dos dados recolhidos revelou ambiguidades naturais da linguagem usada pelos stakeholders. A sua resolução foi essencial para evitar requisitos redundantes, contraditórios ou insuficientemente precisos.
+
+        \begin{table}[H]
+            \centering
+            \small
+            \begin{tabular}{|p{1.8cm}|p{4.6cm}|p{3.4cm}|p{5cm}|}
+                \hline
+                \rowcolor{gray!20!white}
+                \textbf{Item} & \textbf{Ambiguidade} & \textbf{Impacto} & \textbf{Resolução} \\
+                \hline
+                RF-04 & Campo identificador único do cliente. & Histórico fragmentado e duplicação de registos. & O NIF passa a ser identificador primário do cliente. \\
+                \hline
+                RF-09/RF-10 & Separação entre criação da OS e atribuição do estado inicial. & Implementação inconsistente do fluxo de abertura. & A criação da OS passa a incluir automaticamente a numeração, a data e o estado Recebida. \\
+                \hline
+                RF-10 & Momento em que o diagnóstico se torna obrigatório. & Bloqueio indevido da receção ou avanço sem diagnóstico. & O diagnóstico não é obrigatório na criação, mas passa a ser exigido antes de estados posteriores à fase de diagnóstico. \\
+                \hline
+                RF-23 antigo & Consulta da disponibilidade de peças em separado do catálogo. & Redundância funcional. & A visibilidade do stock é absorvida pelo catálogo de peças e pelo fluxo de associação de peças à intervenção. \\
+                \hline
+                RF-32 & Aplicabilidade da gestão de pagamentos pendentes. & Tratamento indevido de particulares como clientes a crédito. & A gestão de faturas pendentes é considerada relevante sobretudo para clientes empresariais. \\
+                \hline
+            \end{tabular}
+            \caption{Principais ambiguidades identificadas e resolvidas}
+        \end{table}
+
+    \section{Síntese da Fase de Requisitos}
+        A fase de engenharia de requisitos produziu um conjunto consolidado e coerente de requisitos funcionais e não funcionais, suportado por evidência recolhida junto dos stakeholders e por análise de artefactos operacionais reais. Este conjunto constitui a base de entrada para as fases seguintes do projeto, nomeadamente arquitetura, modelação detalhada, implementação e validação.
+
+        A relevância desta etapa é reforçada pelo contexto do trabalho prático de LI4: num processo assistido por LLM, a qualidade dos artefactos iniciais condiciona diretamente a qualidade do software produzido. Um requisito ambíguo ou incompleto propaga-se para a arquitetura, para o código e para os testes. Por essa razão, a clareza e a rastreabilidade aqui alcançadas representam um ganho essencial para a robustez do projeto.
+
+%==========================================================================
+% BEGIN CONCLUSÕES DE TRABALHO FUTURO
+%==========================================================================
+
+\chapter{Conclusões e Trabalho Futuro}
+    O trabalho realizado permitiu transformar um conjunto extenso de notas, entrevistas, artefactos operacionais e rascunhos intermédios num relatório técnico coerente, estruturado e adequado ao contexto académico de LI4. O resultado mais relevante desta fase é a consolidação do problema de negócio num conjunto de objetivos, restrições, user stories e requisitos suficientemente robustos para suportar as etapas seguintes de desenho e implementação.
+
+    Entre os pontos fortes do trabalho destaca-se a triangulação entre entrevistas, documentação física da oficina e reformulação crítica dos requisitos. Esta abordagem permitiu evitar uma especificação meramente abstrata, ancorando cada decisão num problema observado ou numa necessidade explicitamente validada junto dos stakeholders. Destaca-se ainda a preocupação em separar o que é crítico para o MVP do que pode ser evoluído em fases posteriores, o que é essencial para a viabilidade temporal do projeto.
+
+    Como limitações da fase atual, importa reconhecer que alguns artefactos descritos no relatório, como o modelo de domínio gráfico, os diagramas de arquitetura e a definição detalhada de casos de uso, dependem ainda de desenvolvimento posterior. Embora o corpo textual produzido seja suficiente para orientar a fase seguinte, a maturidade do projeto só ficará completa quando estes elementos forem alinhados com os requisitos aqui fixados e validados através de protótipos e testes.
+
+    Em termos de trabalho futuro, identificam-se como próximos passos naturais: a elaboração da arquitetura do sistema, a definição de diagramas UML de suporte, a construção de protótipos de interface com validação pelos utilizadores operacionais e a implementação incremental do MVP. Numa fase posterior, poderão ainda ser consideradas extensões como integração com SMS, faturação consolidada mais avançada para clientes empresariais e mecanismos analíticos mais sofisticados para apoio à decisão.
+
+
+%==========================================================================
+% END CONCLUSÕES DE TRABALHO FUTURO
+%==========================================================================
+
+%==========================================================================
+% BEGIN REFERÊNCIAS
+%==========================================================================
+
+%% Changes biblibography name
+%% Portuguese babel default : "Bibliografia"
+%% Personally I prefer "Referências"
+\renewcommand\bibname{Referências}
+
+%% https://www.overleaf.com/learn/latex/bibliography_management_with_bibtex
+\begin{thebibliography}{9}
+\bibitem{sommerville}
+Ian Sommerville.
+\textit{Software Engineering}.
+10th edition, Pearson, 2016.
+
+\bibitem{ieee830}
+IEEE.
+\textit{IEEE Recommended Practice for Software Requirements Specifications}.
+IEEE Std 830-1998, 1998.
+
+\bibitem{ieee29148}
+ISO/IEC/IEEE.
+\textit{Systems and Software Engineering -- Life Cycle Processes -- Requirements Engineering}.
+ISO/IEC/IEEE 29148:2018, 2018.
+
+\bibitem{rgpd}
+União Europeia.
+\textit{Regulamento (UE) 2016/679 do Parlamento Europeu e do Conselho, de 27 de abril de 2016}.
+
+\bibitem{dl28}
+República Portuguesa.
+\textit{Decreto-Lei n.º 28/2019, de 15 de fevereiro}.
+\end{thebibliography}
+
+
+%==========================================================================
+% END REFERÊNCIAS
+%==========================================================================
+
+%==========================================================================
+% BEGIN ANEXOS
+%==========================================================================
+
+%% Why \addchap, instead of \chapter? 
+%% \addchap has no numbering but appears in table of contents.
+\addchap{Anexos}
+
+    Os anexos seguintes sintetizam as principais fontes empíricas utilizadas durante a fase de conceção e engenharia de requisitos. Em vez de reproduzir versões redundantes ou desatualizadas do material de trabalho, apresentam-se apenas os elementos estabilizados que sustentam o relatório principal.
+
+    \addsec{Anexo A -- Síntese da Entrevista-001}
+    A Entrevista-001, realizada em 17 de fevereiro de 2026, incidiu sobre a definição do domínio e permitiu identificar o fluxo base da oficina: receção do cliente, registo da trotinete, criação da ordem de serviço, diagnóstico, intervenções, consumo de peças, faturação e entrega. Nesta sessão foram igualmente identificados os estados da ordem de serviço e a necessidade de rastrear clientes, equipamentos e peças de forma centralizada.
+
+    \addsec{Anexo B -- Síntese da Entrevista-002}
+    A Entrevista-002, realizada em 20 de fevereiro de 2026, refinou os requisitos do sistema, clarificando regras de negócio específicas: unicidade do número de série, gestão diferenciada de clientes empresariais, alertas de stock, uso de cronómetro, parametrização de IVA e mão de obra, hierarquia de permissões e priorização entre funcionalidades críticas e desejáveis.
+
+    \addsec{Anexo C -- Registos Físicos da Oficina}
+    A análise dos registos físicos da oficina confirmou a existência de ordens de serviço em papel, notas de encomenda, faturas com detalhe de peças e mão de obra e registos de stock com variações manuais. Estes artefactos foram decisivos para validar a granularidade dos dados realmente usados na operação corrente e para justificar a necessidade de centralização e automação.
+
+    \addsec{Anexo D -- Sessão de Validação de Ambiguidades}
+    A sessão de validação realizada em 23 de março de 2026 permitiu fechar ambiguidades críticas, nomeadamente a escolha do NIF como identificador primário do cliente, a obrigatoriedade do estado inicial da ordem de serviço, o caráter progressivo do preenchimento do diagnóstico e a eliminação de requisitos redundantes relacionados com a consulta de stock.
+
+
+%==========================================================================
+% END ANEXOS
+%==========================================================================
+\end{document}
