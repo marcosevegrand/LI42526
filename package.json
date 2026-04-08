@@ -14,6 +14,20 @@
     "test": "turbo run test",
     "format": "prettier --write ."
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ],
+    "ignoredBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
+  },
   "devDependencies": {
     "@types/node": "^22.13.14",
     "eslint": "^9.23.0",

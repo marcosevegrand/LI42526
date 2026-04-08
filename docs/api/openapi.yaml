@@ -2,8 +2,989 @@ openapi: 3.1.0
 info:
   title: Sistema de Gestao para as Oficinas Gengis Khan API
   version: 0.1.0
-  description: Machine-readable artifact placeholder aligned with api-spec.md.
+  description: API machine-readable baseline aligned with backend implementation.
 servers:
-  - url: http://localhost:3000/api/v1
-paths: {}
-components: {}
+  - url: http://localhost:3000
+tags:
+  - name: auth
+  - name: customers
+  - name: scooters
+  - name: service-orders
+  - name: interventions
+  - name: inventory
+  - name: suppliers-procurement
+  - name: billing
+  - name: notifications
+  - name: reports
+  - name: configuration
+paths:
+  /health:
+    get:
+      tags: [auth]
+      summary: Health check
+      responses:
+        '200':
+          description: Service health
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+  /api/v1/auth/login:
+    post:
+      tags: [auth]
+      summary: Login user and set session cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          $ref: '#/components/responses/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/auth/me:
+    get:
+      tags: [auth]
+      summary: Get current authenticated user
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Current user session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionUser'
+        '401':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/auth/logout:
+    post:
+      tags: [auth]
+      summary: Logout current user
+      security:
+        - cookieAuth: []
+      responses:
+        '204':
+          description: Logged out
+
+  /api/v1/customers:
+    get:
+      tags: [customers]
+      summary: List customers
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Customers list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+    post:
+      tags: [customers]
+      summary: Create customer
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Created customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+
+  /api/v1/customers/{nif}:
+    parameters:
+      - $ref: '#/components/parameters/NifParam'
+    get:
+      tags: [customers]
+      summary: Get customer by NIF
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Customer details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+    patch:
+      tags: [customers]
+      summary: Update customer
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Updated customer
+
+  /api/v1/customers/{nif}/history:
+    parameters:
+      - $ref: '#/components/parameters/NifParam'
+    get:
+      tags: [customers]
+      summary: Get customer history
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Customer history
+
+  /api/v1/scooters:
+    get:
+      tags: [scooters]
+      summary: List scooters
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Scooters list
+    post:
+      tags: [scooters]
+      summary: Create scooter
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Scooter'
+      responses:
+        '200':
+          description: Created scooter
+
+  /api/v1/scooters/{serialNumber}:
+    parameters:
+      - $ref: '#/components/parameters/SerialNumberParam'
+    get:
+      tags: [scooters]
+      summary: Get scooter
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Scooter detail
+    patch:
+      tags: [scooters]
+      summary: Update scooter
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Updated scooter
+
+  /api/v1/scooters/{serialNumber}/repairs:
+    parameters:
+      - $ref: '#/components/parameters/SerialNumberParam'
+    get:
+      tags: [scooters]
+      summary: Get scooter repairs history
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Repairs history
+
+  /api/v1/service-orders:
+    get:
+      tags: [service-orders]
+      summary: List service orders
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Service orders list
+    post:
+      tags: [service-orders]
+      summary: Create service order
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceOrderCreateRequest'
+      responses:
+        '200':
+          description: Created service order
+
+  /api/v1/service-orders/summary:
+    get:
+      tags: [service-orders]
+      summary: Get service orders summary
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Summary by status
+
+  /api/v1/service-orders/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [service-orders]
+      summary: Get service order by id
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Service order detail
+    patch:
+      tags: [service-orders]
+      summary: Update service order editable fields
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Updated service order
+
+  /api/v1/service-orders/{id}/status:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    patch:
+      tags: [service-orders]
+      summary: Transition service order status
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [toStatus]
+              properties:
+                toStatus:
+                  type: string
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Updated status
+
+  /api/v1/service-orders/{id}/diagnosis:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    patch:
+      tags: [service-orders]
+      summary: Update diagnosis
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Updated service order diagnosis
+
+  /api/v1/service-orders/{id}/budget:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    patch:
+      tags: [service-orders]
+      summary: Update budget
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Updated budget
+
+  /api/v1/service-orders/{id}/budget/approval:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [service-orders]
+      summary: Record budget approval or rejection
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Budget approval registered
+
+  /api/v1/service-orders/{id}/history:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [service-orders]
+      summary: Get service order history
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Service order history
+
+  /api/v1/service-orders/{serviceOrderId}/interventions:
+    parameters:
+      - name: serviceOrderId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [interventions]
+      summary: List interventions of a service order
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Interventions list
+    post:
+      tags: [interventions]
+      summary: Create intervention
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Created intervention
+
+  /api/v1/interventions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [interventions]
+      summary: Get intervention
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Intervention details
+    patch:
+      tags: [interventions]
+      summary: Update intervention
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Intervention updated
+
+  /api/v1/interventions/{id}/timer/start:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [interventions]
+      summary: Start or resume intervention timer
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Timer started
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/interventions/{id}/timer/pause:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [interventions]
+      summary: Pause intervention timer
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Timer paused
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/interventions/{id}/timer/stop:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [interventions]
+      summary: Stop intervention timer
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Timer stopped
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/interventions/{id}/parts:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [interventions]
+      summary: List intervention parts
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Intervention part associations
+    post:
+      tags: [interventions]
+      summary: Attach part to intervention
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Part attached
+        '409':
+          $ref: '#/components/responses/ErrorResponse'
+
+  /api/v1/parts:
+    get:
+      tags: [inventory]
+      summary: List parts
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Parts list
+    post:
+      tags: [inventory]
+      summary: Create part
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Part created
+
+  /api/v1/parts/low-stock:
+    get:
+      tags: [inventory]
+      summary: List low stock parts
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Low stock parts
+
+  /api/v1/parts/{partReference}:
+    parameters:
+      - name: partReference
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [inventory]
+      summary: Get part
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Part detail
+    patch:
+      tags: [inventory]
+      summary: Update part
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Updated part
+
+  /api/v1/parts/{partReference}/stock-adjustments:
+    parameters:
+      - name: partReference
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags: [inventory]
+      summary: Apply manual stock adjustment
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Part stock adjusted
+
+  /api/v1/stock-movements:
+    get:
+      tags: [inventory]
+      summary: List stock movements
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Stock movement history
+
+  /api/v1/suppliers:
+    get:
+      tags: [suppliers-procurement]
+      summary: List suppliers
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Suppliers list
+    post:
+      tags: [suppliers-procurement]
+      summary: Create supplier
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Supplier created
+
+  /api/v1/suppliers/{supplierId}:
+    parameters:
+      - name: supplierId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [suppliers-procurement]
+      summary: Get supplier
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Supplier detail
+    patch:
+      tags: [suppliers-procurement]
+      summary: Update supplier
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Supplier updated
+
+  /api/v1/purchase-orders:
+    get:
+      tags: [suppliers-procurement]
+      summary: List purchase orders
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Purchase order list
+    post:
+      tags: [suppliers-procurement]
+      summary: Create purchase order
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Purchase order created
+
+  /api/v1/purchase-orders/generate-from-low-stock:
+    post:
+      tags: [suppliers-procurement]
+      summary: Generate purchase orders from low stock
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Purchase orders generated
+
+  /api/v1/purchase-orders/{purchaseOrderId}:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [suppliers-procurement]
+      summary: Get purchase order
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Purchase order detail
+    patch:
+      tags: [suppliers-procurement]
+      summary: Update purchase order
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Purchase order updated
+
+  /api/v1/purchase-orders/{purchaseOrderId}/receive:
+    parameters:
+      - name: purchaseOrderId
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [suppliers-procurement]
+      summary: Mark purchase order as received
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Purchase order received
+
+  /api/v1/invoices:
+    get:
+      tags: [billing]
+      summary: List invoices
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Invoice list
+    post:
+      tags: [billing]
+      summary: Issue invoice
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Invoice issued
+
+  /api/v1/invoices/pending-business:
+    get:
+      tags: [billing]
+      summary: List pending business invoices
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Pending invoices
+
+  /api/v1/invoices/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [billing]
+      summary: Get invoice
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Invoice detail
+
+  /api/v1/invoices/{id}/pdf:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    get:
+      tags: [billing]
+      summary: Get invoice PDF
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Invoice PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+
+  /api/v1/invoices/{id}/payments:
+    parameters:
+      - $ref: '#/components/parameters/IdParam'
+    post:
+      tags: [billing]
+      summary: Register invoice payment
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Payment registered
+
+  /api/v1/notifications:
+    get:
+      tags: [notifications]
+      summary: List notifications
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Notifications list
+    post:
+      tags: [notifications]
+      summary: Send notification
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Notification queued/sent
+
+  /api/v1/notification-templates:
+    get:
+      tags: [notifications]
+      summary: List notification templates
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Template list
+
+  /api/v1/notification-templates/{templateId}:
+    parameters:
+      - name: templateId
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: [notifications]
+      summary: Update notification template
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Template updated
+
+  /api/v1/reports/operations:
+    get:
+      tags: [reports]
+      summary: Operations report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Operations report data
+
+  /api/v1/reports/billing:
+    get:
+      tags: [reports]
+      summary: Billing report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Billing metrics
+
+  /api/v1/reports/costs:
+    get:
+      tags: [reports]
+      summary: Cost report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Cost metrics
+
+  /api/v1/reports/parts-usage:
+    get:
+      tags: [reports]
+      summary: Parts usage report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Parts usage metrics
+
+  /api/v1/reports/common-failures:
+    get:
+      tags: [reports]
+      summary: Common failures report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Common failures metrics
+
+  /api/v1/reports/repair-time:
+    get:
+      tags: [reports]
+      summary: Repair time report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Repair time metrics
+
+  /api/v1/reports/mechanic-productivity:
+    get:
+      tags: [reports]
+      summary: Mechanic productivity report
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Productivity metrics
+
+  /api/v1/config/financial-parameters:
+    get:
+      tags: [configuration]
+      summary: Get financial parameters
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Financial config values
+    patch:
+      tags: [configuration]
+      summary: Update financial parameters
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Updated config
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    NifParam:
+      name: nif
+      in: path
+      required: true
+      schema:
+        type: string
+    SerialNumberParam:
+      name: serialNumber
+      in: path
+      required: true
+      schema:
+        type: string
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+  responses:
+    ErrorResponse:
+      description: Error payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status, service]
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: api
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            statusCode:
+              type: integer
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    SessionUser:
+      type: object
+      required: [id, fullName, email, role]
+      properties:
+        id:
+          type: string
+        fullName:
+          type: string
+        email:
+          type: string
+          format: email
+        role:
+          type: string
+          enum: [manager, mechanic]
+    LoginResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: '#/components/schemas/SessionUser'
+    Customer:
+      type: object
+      properties:
+        nif:
+          type: string
+        customerType:
+          type: string
+          enum: [personal, business]
+        fullName:
+          type: string
+        legalName:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        address:
+          type: string
+        creditLimit:
+          type: string
+        paymentTerms:
+          type: string
+        isArchived:
+          type: boolean
+    Scooter:
+      type: object
+      properties:
+        serialNumber:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        conditionNotes:
+          type: string
+        customerNif:
+          type: string
+        isArchived:
+          type: boolean
+    ServiceOrderCreateRequest:
+      type: object
+      required: [customerNif, scooterSerialNumber, reportedProblem]
+      properties:
+        customerNif:
+          type: string
+        scooterSerialNumber:
+          type: string
+        reportedProblem:
+          type: string
+        estimatedCompletionDate:
+          type: string
+          format: date

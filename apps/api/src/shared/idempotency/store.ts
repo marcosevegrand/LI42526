@@ -13,3 +13,7 @@ export function rememberIdempotencyRecord(record: IdempotencyRecord) {
 export function getIdempotencyRecord(key: string) {
   return store.get(key) ?? null;
 }
+
+export function forgetIdempotencyRecord(key: string) {
+  store.delete(key);
+}

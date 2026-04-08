@@ -7,6 +7,7 @@ import { loadEnv } from '../../env';
 export type SessionUser = {
   id: string;
   fullName: string;
+  email: string;
   role: 'manager' | 'mechanic';
 };
 
@@ -25,7 +26,11 @@ function readSessionUser(request: FastifyRequest): SessionUser | null {
   }
 
   try {
-    return jwt.verify(token, env.JWT_SECRET) as SessionUser;
+    const payload = jwt.verify(token, env.JWT_SECRET) as SessionUser;
+    if (!payload.id || !payload.fullName || !payload.email || !payload.role) {
+      return null;
+    }
+    return payload;
   } catch {
     return null;
   }
