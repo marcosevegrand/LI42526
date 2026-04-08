@@ -1,0 +1,37 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:54322/postgres
+      DIRECT_DATABASE_URL: postgresql://postgres:postgres@host.docker.internal:54322/postgres
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+    ports:
+      - '3000:3000'
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    depends_on:
+      - mailpit
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    env_file:
+      - .env
+    environment:
+      VITE_API_URL: http://localhost:3000/api/v1
+    ports:
+      - '5173:5173'
+    depends_on:
+      - api
+
+  mailpit:
+    image: axllent/mailpit:v1.21
+    ports:
+      - '1025:1025'
+      - '8025:8025'
