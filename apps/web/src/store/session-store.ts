@@ -1,15 +1,17 @@
 import { create } from 'zustand';
 
+import type { SessionUser } from '@/lib/auth/session-api';
+
 type SessionStore = {
   isAuthenticated: boolean;
-  role: 'manager' | 'mechanic' | null;
-  setSession: (role: SessionStore['role']) => void;
+  user: SessionUser | null;
+  setSession: (user: SessionUser) => void;
   clearSession: () => void;
 };
 
 export const useSessionStore = create<SessionStore>((set) => ({
-  isAuthenticated: true,
-  role: 'manager',
-  setSession: (role) => set({ isAuthenticated: true, role }),
-  clearSession: () => set({ isAuthenticated: false, role: null }),
+  isAuthenticated: false,
+  user: null,
+  setSession: (user) => set({ isAuthenticated: true, user }),
+  clearSession: () => set({ isAuthenticated: false, user: null }),
 }));

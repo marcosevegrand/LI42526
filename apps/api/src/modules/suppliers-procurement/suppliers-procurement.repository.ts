@@ -1,4 +1,8 @@
+import type { Prisma } from '@prisma/client';
+
 import { getPrismaClient } from '../../shared/db/prisma';
+
+type TransactionClient = Prisma.TransactionClient;
 
 type CreateSupplierInput = {
   name: string;
@@ -101,7 +105,7 @@ export class SuppliersProcurementRepository {
   }
 
   async receivePurchaseOrder(id: string) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const purchaseOrder = await tx.purchaseOrder.findUnique({
         where: { id },
         include: {

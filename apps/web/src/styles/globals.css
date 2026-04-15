@@ -2,16 +2,101 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Base ─── */
 :root {
-  color: #1b1b1b;
-  background: #f4efe8;
-  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  color: #e5e2e1;
+  background: #131313;
+  font-family: 'Manrope', system-ui, sans-serif;
 }
 
 body {
   margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom selection */
+::selection {
+  background: rgba(255, 180, 168, 0.3);
+  color: #e5e2e1;
+}
+
+/* ─── Utility classes (Stitch design system) ─── */
+@layer components {
+  /* Glass morphism cards */
+  .glass-card {
+    background: rgba(53, 53, 52, 0.85);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  .glass-panel {
+    background: rgba(53, 53, 52, 0.65);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(87, 66, 62, 0.15);
+  }
+
+  /* Industrial gradient (deep red radial) */
+  .industrial-gradient {
+    background: radial-gradient(ellipse at top left, #5E0101 0%, #0e0e0e 70%);
+  }
+
+  /* Minimalist ledger inputs (transparent + bottom border) */
+  .minimalist-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(87, 66, 62, 0.2);
+    padding: 0.5rem 0;
+    color: #e5e2e1;
+    font-family: 'Manrope', system-ui, sans-serif;
+    font-size: 0.875rem;
+    transition: border-color 0.3s ease;
+    outline: none;
+    width: 100%;
+  }
+
+  .minimalist-input:focus {
+    border-bottom-color: #ffb4a8;
+    border-bottom-width: 2px;
+  }
+
+  .minimalist-input::placeholder {
+    color: rgba(222, 192, 187, 0.4);
+  }
+
+  /* Ghost border (subtle accessibility boundary) */
+  .ghost-border {
+    border: 1px solid rgba(87, 66, 62, 0.15);
+  }
+
+  /* Serif headline utility */
+  .font-headline {
+    font-family: 'Newsreader', Georgia, serif;
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Text balance for headlines */
+  .text-balance {
+    text-wrap: balance;
+  }
 }

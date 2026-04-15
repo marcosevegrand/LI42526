@@ -29,13 +29,13 @@ export class BillingService {
     const vatRate = this.toNumber(config?.vatRate ?? '0.00');
 
     const laborSeconds = serviceOrder.interventions.reduce(
-      (acc: number, intervention: any) => acc + intervention.elapsedSeconds,
+      (acc, intervention) => acc + intervention.elapsedSeconds,
       0,
     );
     const laborAmount = (laborSeconds / 3600) * hourlyLaborRate;
 
-    const partsAmount = serviceOrder.interventions.reduce((interventionAcc: number, intervention: any) => {
-      const interventionPartsAmount = intervention.parts.reduce((partAcc: number, association: any) => {
+    const partsAmount = serviceOrder.interventions.reduce((interventionAcc, intervention) => {
+      const interventionPartsAmount = intervention.parts.reduce((partAcc, association) => {
         return partAcc + association.quantity * this.toNumber(association.part.salePrice);
       }, 0);
       return interventionAcc + interventionPartsAmount;

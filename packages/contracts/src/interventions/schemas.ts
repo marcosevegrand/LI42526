@@ -9,6 +9,7 @@ export const interventionSchema = z.object({
   notes: z.string().optional(),
   elapsedSeconds: z.number().int().nonnegative().default(0),
   timerState: z.enum(timerStates).default('idle'),
+  timerStartedAt: z.string().datetime().optional(),
 });
 
 export const interventionPartAssociationSchema = z.object({

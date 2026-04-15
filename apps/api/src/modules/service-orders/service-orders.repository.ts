@@ -1,4 +1,8 @@
+import type { Prisma } from '@prisma/client';
+
 import { getPrismaClient } from '../../shared/db/prisma';
+
+type TransactionClient = Prisma.TransactionClient;
 
 type CreateServiceOrderInput = {
   customerNif: string;
@@ -17,7 +21,7 @@ type ListServiceOrdersInput = {
 
 export class ServiceOrdersRepository {
   async create(input: CreateServiceOrderInput) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const created = await tx.serviceOrder.create({
         data: {
           customerNif: input.customerNif,
@@ -69,7 +73,7 @@ export class ServiceOrdersRepository {
     },
     changedByUserId?: string,
   ) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const updated = await tx.serviceOrder.update({
         where: { id },
         data: {
@@ -101,7 +105,7 @@ export class ServiceOrdersRepository {
   ) {
     const now = new Date();
 
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const previous = await tx.serviceOrder.findUnique({
         where: { id },
         select: { status: true },
@@ -141,7 +145,7 @@ export class ServiceOrdersRepository {
     },
     changedByUserId?: string,
   ) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const updated = await tx.serviceOrder.update({
         where: { id },
         data: {
@@ -172,7 +176,7 @@ export class ServiceOrdersRepository {
     },
     changedByUserId?: string,
   ) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const updated = await tx.serviceOrder.update({
         where: { id },
         data: {
@@ -202,7 +206,7 @@ export class ServiceOrdersRepository {
       changedByUserId?: string;
     },
   ) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const updated = await tx.serviceOrder.update({
         where: { id },
         data: {

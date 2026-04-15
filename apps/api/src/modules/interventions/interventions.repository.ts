@@ -1,4 +1,8 @@
+import type { Prisma } from '@prisma/client';
+
 import { getPrismaClient } from '../../shared/db/prisma';
+
+type TransactionClient = Prisma.TransactionClient;
 
 type CreateInterventionInput = {
   serviceOrderId: string;
@@ -88,7 +92,7 @@ export class InterventionsRepository {
     quantity: number;
     note?: string;
   }) {
-    return getPrismaClient().$transaction(async (tx: any) => {
+    return getPrismaClient().$transaction(async (tx: TransactionClient) => {
       const part = await tx.part.findUnique({
         where: { partReference: input.partReference },
       });

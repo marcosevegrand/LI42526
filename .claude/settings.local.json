@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xelatex --version)",
+      "Bash(pdflatex --version)",
+      "Bash(find /c/Users/PC/Desktop/LI4/Project/LI42526 -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.js\" -o -name \"*.json\" \\\\\\) -exec grep -l -i \"supabase\" {} \\\\;)",
+      "mcp__stitch__list_projects",
+      "WebFetch(domain:contribution.usercontent.google.com)",
+      "Bash(ls node_modules/.bin/tsc*)",
+      "Bash(node_modules/.bin/tsc --version)",
+      "Bash(npm install:*)",
+      "Bash(corepack enable:*)",
+      "Bash(corepack prepare:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm --filter web typecheck)",
+      "Bash(pnpm --filter web build)",
+      "Bash(ls -la /c/Users/PC/Desktop/LI4/Project/LI42526/apps/api/src/modules/*/index.ts)"
+    ]
+  }
+}

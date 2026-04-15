@@ -6,6 +6,7 @@ coverage
 .env
 .env.local
 .env.*.local
+.mcp.json
 pnpm-lock.yaml
 apps/api/generated
 apps/api/prisma/dev.db
