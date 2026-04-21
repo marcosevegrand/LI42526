@@ -5,8 +5,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
-import { ApiError } from '@/lib/api/http-client';
 import { loginWithPassword } from '@/lib/auth/session-api';
+import { getUserFacingError } from '@/lib/errors/user-facing-error';
 import { useSessionStore } from '@/store/session-store';
 
 export function AuthPage() {
@@ -16,6 +16,7 @@ export function AuthPage() {
   const setSession = useSessionStore((s) => s.setSession);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const fromPath = (location.state as { from?: string } | null)?.from;
 
@@ -33,9 +34,10 @@ export function AuthPage() {
     loginMutation.mutate({ email, password });
   };
 
-  const loginErrorMessage = loginMutation.error instanceof ApiError
-    ? loginMutation.error.message
-    : 'Nao foi possivel iniciar sessao.';
+  const loginErrorMessage = getUserFacingError(
+    loginMutation.error,
+    'Nao foi possivel iniciar sessao.',
+  );
 
   return (
     <main className="relative flex min-h-screen items-center justify-center overflow-hidden bg-surface px-4">
@@ -70,21 +72,45 @@ export function AuthPage() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <Input
-            label="Palavra-passe"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div className="space-y-1.5">
+            <label
+              htmlFor="password"
+              className="block text-xs font-medium uppercase tracking-wider text-on-surface-variant"
+            >
+              Palavra-passe
+            </label>
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="minimalist-input pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-1 text-on-surface-variant transition hover:text-on-surface"
+                aria-label={showPassword ? 'Esconder palavra-passe' : 'Mostrar palavra-passe'}
+                title={showPassword ? 'Esconder palavra-passe' : 'Mostrar palavra-passe'}
+              >
+                <Icon name={showPassword ? 'visibility_off' : 'visibility'} size={18} />
+              </button>
+            </div>
+          </div>
 
           <Button type="submit" className="w-full py-3" disabled={loginMutation.isPending}>
             {loginMutation.isPending ? 'A entrar...' : 'Entrar no Sistema'}
           </Button>
 
           {loginMutation.isError && (
-            <p className="rounded-lg bg-error-container/30 px-3 py-2 text-sm text-on-surface">
+            <p
+              role="alert"
+              aria-live="assertive"
+              className="rounded-lg bg-error-container/30 px-3 py-2 text-sm text-on-surface"
+            >
               {loginErrorMessage}
             </p>
           )}

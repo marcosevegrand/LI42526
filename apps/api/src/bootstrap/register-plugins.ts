@@ -11,7 +11,15 @@ export async function registerPlugins(app: FastifyInstance) {
   const env = loadEnv();
 
   await app.register(cors, {
-    origin: ['http://localhost:5173'],
+    origin: (origin, callback) => {
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      const isLocalOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      callback(null, isLocalOrigin);
+    },
     credentials: true,
   });
 

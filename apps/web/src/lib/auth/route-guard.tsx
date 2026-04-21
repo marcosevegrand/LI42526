@@ -6,6 +6,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 
 import { ApiError } from '@/lib/api/http-client';
 import { fetchSession } from '@/lib/auth/session-api';
+import { getUserFacingError } from '@/lib/errors/user-facing-error';
 import { useSessionStore } from '@/store/session-store';
 
 export function RouteGuard({ children }: PropsWithChildren) {
@@ -43,6 +44,17 @@ export function RouteGuard({ children }: PropsWithChildren) {
     }
   }, [sessionQuery.status, sessionQuery.isFetching, sessionQuery.error, clearSession]);
 
+  const shouldShowSessionError =
+    !isAuthenticated &&
+    sessionQuery.status === 'error' &&
+    !sessionQuery.isFetching &&
+    !(sessionQuery.error instanceof ApiError && sessionQuery.error.status === 401);
+
+  const sessionErrorMessage = getUserFacingError(
+    sessionQuery.error,
+    'Nao foi possivel validar a sessao.',
+  );
+
   if (sessionQuery.isPending && !isAuthenticated) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-surface">
@@ -51,11 +63,11 @@ export function RouteGuard({ children }: PropsWithChildren) {
     );
   }
 
-  if (!isAuthenticated && sessionQuery.error && !(sessionQuery.error instanceof ApiError)) {
+  if (shouldShowSessionError) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-surface px-4 text-center">
-        <p className="text-sm text-on-surface-variant">
-          Nao foi possivel validar a sessao. Verifique se a API esta ativa.
+        <p role="alert" aria-live="assertive" className="text-sm text-on-surface-variant">
+          {sessionErrorMessage}
         </p>
         <button
           onClick={() => {

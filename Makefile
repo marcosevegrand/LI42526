@@ -19,7 +19,7 @@ LATEXMK ?= latexmk
 MIGRATION_NAME ?= dev
 
 .PHONY: help setup ensure-env install clean \
-	dev dev-api dev-web build lint typecheck test format \
+	dev-clean dev-prepare dev dev-api dev-web build lint typecheck test format \
 	docker-up docker-down docker-logs \
 	supabase-start supabase-stop supabase-status \
 	db-generate db-migrate db-reset db-seed db-studio \
@@ -44,6 +44,29 @@ install: ## Instala dependencias do monorepo
 
 clean: ## Limpa artefactos de build do monorepo
 	$(PNPM) -r exec rm -rf dist
+
+dev-clean: ## Limpeza total (processos/portas/containers) antes do desenvolvimento
+	@echo "A limpar processos e portas de desenvolvimento..."
+	@pkill -f '[v]ite' >/dev/null 2>&1 || true
+	@pkill -f '[t]urbo run dev' >/dev/null 2>&1 || true
+	@pkill -f '[t]sx watch' >/dev/null 2>&1 || true
+	@pkill -f '[@]gengis-khan/web' >/dev/null 2>&1 || true
+	@pkill -f '[@]gengis-khan/api' >/dev/null 2>&1 || true
+	@for port in 5173 5174 3001 3000 54321 54322 54323 54324; do \
+		pids=$$(ss -ltnp 2>/dev/null | awk -v p=":$$port" '$$4 ~ p { if (match($$0, /pid=[0-9]+/)) { pid=substr($$0, RSTART+4, RLENGTH-4); print pid } }' | sort -u); \
+		if [ -n "$$pids" ]; then \
+			echo "A terminar PID(s) na porta $$port: $$pids"; \
+			kill $$pids >/dev/null 2>&1 || true; \
+		fi; \
+	done
+	@echo "A parar stack local do Supabase (se ativa)..."
+	@command -v $(SUPABASE) >/dev/null && $(SUPABASE) stop >/dev/null 2>&1 || true
+	@echo "A parar containers do docker-compose (se ativos)..."
+	@$(COMPOSE) down >/dev/null 2>&1 || true
+	@echo "Limpeza concluida."
+
+dev-prepare: dev-clean supabase-start ## Faz limpeza total e prepara o ambiente local
+	@echo "Ambiente preparado. Agora corre: make dev"
 
 dev: ## Corre API + Web em modo desenvolvimento (turbo)
 	$(PNPM) dev
@@ -91,18 +114,23 @@ supabase-status: ## Mostra estado do Supabase local
 	$(SUPABASE) status
 
 db-generate: ## Gera Prisma Client
+	@set -a; [ -f .env ] && . ./.env; set +a; \
 	$(PNPM) --filter $(API_FILTER) exec prisma generate
 
 db-migrate: ## Corre migracoes Prisma (usar MIGRATION_NAME=nome)
+	@set -a; [ -f .env ] && . ./.env; set +a; \
 	$(PNPM) --filter $(API_FILTER) exec prisma migrate dev --name $(MIGRATION_NAME)
 
 db-reset: ## Reset da base de dados local com seed
+	@set -a; [ -f .env ] && . ./.env; set +a; \
 	$(PNPM) --filter $(API_FILTER) exec prisma migrate reset --force
 
 db-seed: ## Corre seed da base de dados
+	@set -a; [ -f .env ] && . ./.env; set +a; \
 	$(PNPM) --filter $(API_FILTER) exec tsx prisma/seed.ts
 
 db-studio: ## Abre Prisma Studio
+	@set -a; [ -f .env ] && . ./.env; set +a; \
 	$(PNPM) --filter $(API_FILTER) exec prisma studio
 
 latex: latex-build ## Compila o relatorio LaTeX

@@ -1,4 +1,4 @@
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3001/api/v1';
 
 type ApiErrorPayload = {
   error?: string;
@@ -54,11 +54,21 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(buildUrl(path), {
-    ...init,
-    credentials: 'include',
-    headers,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(buildUrl(path), {
+      ...init,
+      credentials: 'include',
+      headers,
+    });
+  } catch {
+    throw new ApiError(
+      'Sem ligacao a API. Verifique se o backend esta ativo e tente novamente.',
+      0,
+      'network_error',
+    );
+  }
 
   if (!response.ok) {
     const payload = (await response.json().catch(() => null)) as ApiErrorPayload | null;

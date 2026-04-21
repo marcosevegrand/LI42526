@@ -51,7 +51,7 @@ async function fetchInvoices(): Promise<ApiInvoice[]> {
   return z.array(invoiceSummarySchema).parse(response);
 }
 
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api/v1';
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3001/api/v1';
 
 function downloadPdf(invoiceId: string) {
   window.open(`${apiBaseUrl}/invoices/${invoiceId}/pdf`, '_blank');
