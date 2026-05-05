@@ -7,6 +7,8 @@ import { logoutSession } from '@/lib/auth/session-api';
 import { cn } from '@/lib/utils/cn';
 import { useSessionStore } from '@/store/session-store';
 
+import { NotificationsBell } from './notifications-bell';
+
 const navigation = [
   { label: 'Dashboard', href: '/', icon: 'dashboard' },
   { label: 'Ordens de Servico', href: '/service-orders', icon: 'assignment' },
@@ -132,10 +134,7 @@ export function AppShell() {
         <main className="min-h-screen px-6 py-6 lg:px-8 lg:py-8">
           {/* Top bar */}
           <div className="mb-8 hidden items-center justify-end gap-4 lg:flex">
-            <button className="relative rounded-lg p-2 text-on-surface-variant transition hover:bg-surface-high hover:text-on-surface">
-              <Icon name="notifications" size={22} />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
-            </button>
+            <NotificationsBell />
             <div className="h-8 w-px bg-outline-variant/15" />
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary-container text-sm font-semibold text-primary">

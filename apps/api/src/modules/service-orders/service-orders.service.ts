@@ -2,7 +2,38 @@ import { serviceOrderStatuses } from '@gengis-khan/contracts';
 
 import { appError } from '../../shared/auth/session';
 import type { SessionUser } from '../../shared/auth/session';
+import { getPrismaClient } from '../../shared/db/prisma';
+import { NotificationsService } from '../notifications/notifications.service';
 import { ServiceOrdersRepository } from './service-orders.repository';
+
+type NotificationKind =
+  | 'reception_confirmation'
+  | 'budget_request'
+  | 'repair_completed'
+  | 'awaiting_parts_delay';
+
+const notificationContent: Record<NotificationKind, { subject: (orderRef: string) => string; body: (ctx: { customerName: string; orderRef: string; problem: string }) => string }> = {
+  reception_confirmation: {
+    subject: (ref) => `Recebemos a sua trotinete (${ref})`,
+    body: ({ customerName, orderRef, problem }) =>
+      `Ola ${customerName},\n\nA sua ordem de servico ${orderRef} foi aberta com o seguinte problema reportado:\n"${problem}"\n\nVamos avisa-lo assim que tivermos um diagnostico.\n\nObrigado,\nGengis Khan — Atelier de Engenharia`,
+  },
+  budget_request: {
+    subject: (ref) => `Aprovacao de orcamento — ${ref}`,
+    body: ({ customerName, orderRef }) =>
+      `Ola ${customerName},\n\nO diagnostico da ordem ${orderRef} foi concluido. Aguardamos a sua aprovacao para avancar com a reparacao.\n\nGengis Khan`,
+  },
+  repair_completed: {
+    subject: (ref) => `Reparacao concluida — ${ref}`,
+    body: ({ customerName, orderRef }) =>
+      `Ola ${customerName},\n\nA reparacao da sua trotinete (ordem ${orderRef}) esta concluida. Pode passar pela oficina para a levantar.\n\nGengis Khan`,
+  },
+  awaiting_parts_delay: {
+    subject: (ref) => `Atualizacao da reparacao — ${ref}`,
+    body: ({ customerName, orderRef }) =>
+      `Ola ${customerName},\n\nA reparacao da ordem ${orderRef} esta a aguardar a chegada de pecas. Vamos retomar assim que estiverem disponiveis.\n\nGengis Khan`,
+  },
+};
 
 type CreateServiceOrderInput = {
   customerNif: string;
@@ -34,7 +65,38 @@ const validTransitions: Record<string, string[]> = {
 };
 
 export class ServiceOrdersService {
-  constructor(private readonly repository = new ServiceOrdersRepository()) {}
+  constructor(
+    private readonly repository = new ServiceOrdersRepository(),
+    private readonly notificationsService = new NotificationsService(),
+  ) {}
+
+  private async sendOrderNotification(
+    kind: NotificationKind,
+    serviceOrder: { id: string; serviceOrderNumber: number; customerNif: string; reportedProblem: string },
+  ): Promise<void> {
+    try {
+      const customer = await getPrismaClient().customer.findUnique({
+        where: { nif: serviceOrder.customerNif },
+      });
+      if (!customer?.email) return;
+      const orderRef = `OS-${String(serviceOrder.serviceOrderNumber).padStart(4, '0')}`;
+      const content = notificationContent[kind];
+      await this.notificationsService.send({
+        type: kind,
+        recipientEmail: customer.email,
+        subject: content.subject(orderRef),
+        body: content.body({
+          customerName: customer.fullName,
+          orderRef,
+          problem: serviceOrder.reportedProblem,
+        }),
+        triggerSource: `service-order:${serviceOrder.id}`,
+      });
+    } catch (err) {
+      // Notifications must not break the main request flow.
+      console.error('[notifications] failed to dispatch', kind, err);
+    }
+  }
 
   async create(input: CreateServiceOrderInput, sessionUser: SessionUser) {
     const customerExists = await this.repository.customerExists(input.customerNif);
@@ -63,6 +125,8 @@ export class ServiceOrdersService {
         : undefined,
       createdByUserId: sessionUser.id,
     });
+
+    void this.sendOrderNotification('reception_confirmation', serviceOrder);
 
     return this.toDto(serviceOrder);
   }
@@ -242,6 +306,17 @@ export class ServiceOrdersService {
     const updated = await this.repository.updateStatus(input.id, input.toStatus, {
       changedByUserId: input.sessionUser.id,
     });
+
+    const transitionToNotificationKind: Partial<Record<string, NotificationKind>> = {
+      'awaiting-customer-approval': 'budget_request',
+      'awaiting-parts': 'awaiting_parts_delay',
+      completed: 'repair_completed',
+    };
+    const kind = transitionToNotificationKind[input.toStatus];
+    if (kind) {
+      void this.sendOrderNotification(kind, updated);
+    }
+
     return this.toDto(updated);
   }
 

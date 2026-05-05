@@ -137,6 +137,7 @@ export function ServiceOrdersPage() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['service-orders'] });
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] });
       setCreateOpen(false);
       setForm(emptyForm);
       setFormError('');

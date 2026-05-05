@@ -198,6 +198,7 @@ export function ServiceOrderDetailPage() {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['service-orders'] });
       void queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      void queryClient.invalidateQueries({ queryKey: ['notifications'] });
       setStatusError('');
     },
     onError: (err) => {
