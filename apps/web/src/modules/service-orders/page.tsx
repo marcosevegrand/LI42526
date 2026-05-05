@@ -2,6 +2,7 @@ import { customerSchema, serviceOrderStatuses } from '@gengis-khan/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -87,13 +88,36 @@ const emptyForm = {
   estimatedCompletionDate: '',
 };
 
+const emptyCustomerForm = {
+  nif: '',
+  customerType: 'personal' as 'personal' | 'business',
+  fullName: '',
+  legalName: '',
+  email: '',
+  phone: '',
+  address: '',
+};
+
+const emptyScooterForm = {
+  serialNumber: '',
+  brand: '',
+  model: '',
+  customerNif: '',
+  conditionNotes: '',
+};
+
 export function ServiceOrdersPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [createOpen, setCreateOpen] = useState(false);
-  const [viewOrder, setViewOrder] = useState<ServiceOrder | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState('');
-  const [statusError, setStatusError] = useState('');
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [customerForm, setCustomerForm] = useState(emptyCustomerForm);
+  const [customerError, setCustomerError] = useState('');
+  const [scooterOpen, setScooterOpen] = useState(false);
+  const [scooterForm, setScooterForm] = useState(emptyScooterForm);
+  const [scooterError, setScooterError] = useState('');
 
   const serviceOrdersQuery = useQuery({ queryKey: ['service-orders', 'list'], queryFn: fetchServiceOrders });
   const summaryQuery = useQuery({ queryKey: ['service-orders', 'summary', 'last-30-days'], queryFn: fetchServiceOrderSummary });
@@ -118,24 +142,73 @@ export function ServiceOrdersPage() {
       setFormError('');
     },
     onError: (err) => {
+      const message = err instanceof ApiError ? err.message : '';
+      if (message.includes('scooterSerialNumber does not exist')) {
+        setScooterForm({
+          serialNumber: form.scooterSerialNumber,
+          brand: '',
+          model: '',
+          customerNif: form.customerNif,
+          conditionNotes: '',
+        });
+        setScooterError('');
+        setScooterOpen(true);
+        setFormError('');
+        return;
+      }
       setFormError(err instanceof ApiError ? err.message : 'Erro ao criar ordem.');
     },
   });
 
-  const statusMutation = useMutation({
-    mutationFn: async ({ id, toStatus }: { id: string; toStatus: string }) => {
-      await apiFetch(`/service-orders/${id}/status`, {
-        method: 'PATCH',
-        body: JSON.stringify({ toStatus }),
+  const createScooterMutation = useMutation({
+    mutationFn: async (data: typeof emptyScooterForm) => {
+      await apiFetch('/scooters', {
+        method: 'POST',
+        body: JSON.stringify({
+          serialNumber: data.serialNumber,
+          brand: data.brand,
+          model: data.model,
+          customerNif: data.customerNif,
+          conditionNotes: data.conditionNotes || undefined,
+        }),
       });
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['service-orders'] });
-      setViewOrder(null);
-      setStatusError('');
+      setScooterOpen(false);
+      setScooterError('');
+      // retry the original service order creation
+      createMutation.mutate(form);
     },
     onError: (err) => {
-      setStatusError(err instanceof ApiError ? err.message : 'Erro ao mudar estado.');
+      setScooterError(err instanceof ApiError ? err.message : 'Erro ao registar trotinete.');
+    },
+  });
+
+  const createCustomerMutation = useMutation({
+    mutationFn: async (data: typeof emptyCustomerForm) => {
+      await apiFetch('/customers', {
+        method: 'POST',
+        body: JSON.stringify({
+          nif: data.nif,
+          customerType: data.customerType,
+          fullName: data.fullName,
+          legalName: data.customerType === 'business' ? data.legalName : undefined,
+          email: data.email,
+          phone: data.phone,
+          address: data.address || undefined,
+        }),
+      });
+      return data.nif;
+    },
+    onSuccess: (newNif) => {
+      void queryClient.invalidateQueries({ queryKey: ['customers'] });
+      setForm((prev) => ({ ...prev, customerNif: newNif }));
+      setCustomerOpen(false);
+      setCustomerForm(emptyCustomerForm);
+      setCustomerError('');
+    },
+    onError: (err) => {
+      setCustomerError(err instanceof ApiError ? err.message : 'Erro ao criar cliente.');
     },
   });
 
@@ -200,10 +273,11 @@ export function ServiceOrdersPage() {
       header: '',
       cell: (info) => (
         <button
-          onClick={() => setViewOrder(info.row.original)}
+          onClick={() => navigate(`/service-orders/${info.row.original.id}`)}
           className="rounded-md p-1.5 text-on-surface-variant transition hover:bg-surface-highest hover:text-on-surface"
+          title="Abrir ordem"
         >
-          <Icon name="visibility" size={16} />
+          <Icon name="open_in_new" size={16} />
         </button>
       ),
     }),
@@ -245,7 +319,20 @@ export function ServiceOrdersPage() {
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Nova Ordem de Servico">
         <div className="space-y-4">
           {formError && <p className="text-sm text-error">{formError}</p>}
-          <Select label="Cliente" value={form.customerNif} onChange={(e) => updateField('customerNif', e.target.value)} options={customerOptions} />
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="block text-xs font-medium uppercase tracking-wider text-on-surface-variant">Cliente</span>
+              <button
+                type="button"
+                onClick={() => { setCustomerForm(emptyCustomerForm); setCustomerError(''); setCustomerOpen(true); }}
+                className="flex items-center gap-1 text-xs font-medium text-primary transition hover:text-primary/80"
+              >
+                <Icon name="add" size={14} />
+                Novo Cliente
+              </button>
+            </div>
+            <Select value={form.customerNif} onChange={(e) => updateField('customerNif', e.target.value)} options={customerOptions} />
+          </div>
           <Input label="N. Serie da Trotinete" value={form.scooterSerialNumber} onChange={(e) => updateField('scooterSerialNumber', e.target.value)} />
           <Input label="Problema Reportado" value={form.reportedProblem} onChange={(e) => updateField('reportedProblem', e.target.value)} />
           <Input label="Data Estimada de Conclusao" type="date" value={form.estimatedCompletionDate} onChange={(e) => updateField('estimatedCompletionDate', e.target.value)} />
@@ -258,69 +345,59 @@ export function ServiceOrdersPage() {
         </div>
       </Modal>
 
-      {/* View Modal */}
-      <Modal open={!!viewOrder} onClose={() => { setViewOrder(null); setStatusError(''); }} title="Detalhe da Ordem de Servico">
-        {viewOrder && (
-          <div className="space-y-3">
-            {statusError && <p className="text-sm text-error">{statusError}</p>}
-            <DetailRow label="Referencia" value={viewOrder.reference} />
-            <DetailRow label="Cliente" value={viewOrder.client} />
-            <DetailRow label="NIF" value={viewOrder.clientNif} />
-            <DetailRow label="Trotinete" value={viewOrder.scooter} />
-            <DetailRow label="Problema" value={viewOrder.description} />
-            <div className="flex justify-between items-center">
-              <p className="text-xs uppercase tracking-wider text-on-surface-variant">Estado</p>
-              <StatusBadge status={viewOrder.status} />
-            </div>
-            <DetailRow label="Data" value={viewOrder.createdAt} />
-
-            <div className="border-t border-outline-variant/15 pt-4">
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Mudar Estado</p>
-              <div className="flex flex-wrap gap-2">
-                {nextStatuses(viewOrder.status).map((next) => (
-                  <Button
-                    key={next.value}
-                    size="sm"
-                    variant="outline"
-                    onClick={() => statusMutation.mutate({ id: viewOrder.id, toStatus: next.value })}
-                    disabled={statusMutation.isPending}
-                  >
-                    {next.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Inline Scooter Create Modal — triggered when serial doesn't exist for customer */}
+      <Modal open={scooterOpen} onClose={() => setScooterOpen(false)} title="Registar Nova Trotinete">
+        <div className="space-y-4">
+          <p className="text-sm text-on-surface-variant">
+            A trotinete com numero de serie <span className="font-mono font-semibold text-on-surface">{scooterForm.serialNumber}</span> nao esta associada a este cliente. Preencha os dados para a registar e continuar.
+          </p>
+          {scooterError && <p className="text-sm text-error">{scooterError}</p>}
+          <Input label="Numero de Serie" value={scooterForm.serialNumber} onChange={(e) => setScooterForm((p) => ({ ...p, serialNumber: e.target.value }))} />
+          <Input label="Marca" value={scooterForm.brand} onChange={(e) => setScooterForm((p) => ({ ...p, brand: e.target.value }))} />
+          <Input label="Modelo" value={scooterForm.model} onChange={(e) => setScooterForm((p) => ({ ...p, model: e.target.value }))} />
+          <Input label="Notas de Condicao (opcional)" value={scooterForm.conditionNotes} onChange={(e) => setScooterForm((p) => ({ ...p, conditionNotes: e.target.value }))} />
+        </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setScooterOpen(false)}>Cancelar</Button>
+          <Button
+            onClick={() => createScooterMutation.mutate(scooterForm)}
+            disabled={createScooterMutation.isPending || createMutation.isPending || !scooterForm.brand.trim() || !scooterForm.model.trim()}
+          >
+            {createScooterMutation.isPending || createMutation.isPending ? 'A registar...' : 'Registar e Criar Ordem'}
+          </Button>
+        </div>
       </Modal>
-    </div>
-  );
-}
 
-const statusTransitions: Record<string, { value: string; label: string }[]> = {
-  'received': [{ value: 'in-diagnosis', label: 'Iniciar Diagnostico' }],
-  'in-diagnosis': [
-    { value: 'awaiting-customer-approval', label: 'Pedir Aprovacao' },
-    { value: 'in-repair', label: 'Iniciar Reparacao' },
-  ],
-  'awaiting-customer-approval': [
-    { value: 'in-repair', label: 'Iniciar Reparacao' },
-    { value: 'awaiting-parts', label: 'Aguardar Pecas' },
-  ],
-  'awaiting-parts': [{ value: 'in-repair', label: 'Iniciar Reparacao' }],
-  'in-repair': [{ value: 'completed', label: 'Concluir' }],
-  'completed': [{ value: 'delivered', label: 'Entregar' }],
-};
+      {/* Inline Customer Create Modal */}
+      <Modal open={customerOpen} onClose={() => setCustomerOpen(false)} title="Novo Cliente">
+        <div className="space-y-4">
+          {customerError && <p className="text-sm text-error">{customerError}</p>}
+          <Input label="NIF" value={customerForm.nif} onChange={(e) => setCustomerForm((p) => ({ ...p, nif: e.target.value }))} />
+          <Select
+            label="Tipo"
+            value={customerForm.customerType}
+            onChange={(e) => setCustomerForm((p) => ({ ...p, customerType: e.target.value as 'personal' | 'business' }))}
+            options={[
+              { value: 'personal', label: 'Particular' },
+              { value: 'business', label: 'Empresarial' },
+            ]}
+          />
+          <Input label="Nome Completo" value={customerForm.fullName} onChange={(e) => setCustomerForm((p) => ({ ...p, fullName: e.target.value }))} />
+          {customerForm.customerType === 'business' && (
+            <Input label="Nome Legal" value={customerForm.legalName} onChange={(e) => setCustomerForm((p) => ({ ...p, legalName: e.target.value }))} />
+          )}
+          <Input label="Email" type="email" value={customerForm.email} onChange={(e) => setCustomerForm((p) => ({ ...p, email: e.target.value }))} />
+          <Input label="Telefone" value={customerForm.phone} onChange={(e) => setCustomerForm((p) => ({ ...p, phone: e.target.value }))} />
+          <Input label="Morada" value={customerForm.address} onChange={(e) => setCustomerForm((p) => ({ ...p, address: e.target.value }))} />
+        </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setCustomerOpen(false)}>Cancelar</Button>
+          <Button onClick={() => createCustomerMutation.mutate(customerForm)} disabled={createCustomerMutation.isPending}>
+            {createCustomerMutation.isPending ? 'A criar...' : 'Criar Cliente'}
+          </Button>
+        </div>
+      </Modal>
 
-function nextStatuses(current: string): { value: string; label: string }[] {
-  return statusTransitions[current] ?? [];
-}
-
-function DetailRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex justify-between">
-      <p className="text-xs uppercase tracking-wider text-on-surface-variant">{label}</p>
-      <p className="text-sm font-medium text-on-surface">{value}</p>
     </div>
   );
 }

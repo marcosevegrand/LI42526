@@ -1,4 +1,4 @@
-import { invoiceSummarySchema } from '@gengis-khan/contracts';
+import { customerSchema, invoiceSummarySchema, serviceOrderStatuses } from '@gengis-khan/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { createColumnHelper } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
@@ -11,8 +11,40 @@ import { Input } from '@/components/ui/input';
 import { KPICard } from '@/components/ui/kpi-card';
 import { Modal } from '@/components/ui/modal';
 import { PageHeader } from '@/components/ui/page-header';
+import { Select } from '@/components/ui/select';
 import { StatusBadge } from '@/components/ui/status-badge';
 import { ApiError, apiFetch } from '@/lib/api/http-client';
+
+const serviceOrderLookupSchema = z.object({
+  id: z.string(),
+  serviceOrderNumber: z.number(),
+  customerNif: z.string(),
+  scooterSerialNumber: z.string(),
+  status: z.enum(serviceOrderStatuses),
+});
+
+type ApiServiceOrderLookup = z.infer<typeof serviceOrderLookupSchema>;
+type ApiCustomerLookup = z.infer<typeof customerSchema>;
+
+async function fetchServiceOrdersLookup(): Promise<ApiServiceOrderLookup[]> {
+  const response = await apiFetch<unknown>('/service-orders?limit=200');
+  return z.array(serviceOrderLookupSchema).parse(response);
+}
+
+async function fetchCustomersLookup(): Promise<ApiCustomerLookup[]> {
+  const response = await apiFetch<unknown>('/customers?limit=200');
+  return z.array(customerSchema).parse(response);
+}
+
+const paymentMethodOptions = [
+  { value: '', label: 'Selecionar metodo...' },
+  { value: 'Transferencia Bancaria', label: 'Transferencia Bancaria' },
+  { value: 'Multibanco', label: 'Multibanco' },
+  { value: 'MB Way', label: 'MB Way' },
+  { value: 'Numerario', label: 'Numerario' },
+  { value: 'Cartao de Credito', label: 'Cartao de Credito' },
+  { value: 'Cheque', label: 'Cheque' },
+];
 
 type ApiInvoice = z.infer<typeof invoiceSummarySchema>;
 
@@ -53,8 +85,32 @@ async function fetchInvoices(): Promise<ApiInvoice[]> {
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3001/api/v1';
 
-function downloadPdf(invoiceId: string) {
-  window.open(`${apiBaseUrl}/invoices/${invoiceId}/pdf`, '_blank');
+async function downloadPdf(invoiceId: string) {
+  try {
+    const response = await fetch(`${apiBaseUrl}/invoices/${invoiceId}/pdf`, {
+      credentials: 'include',
+      headers: { Accept: 'application/pdf' },
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const win = window.open(url, '_blank');
+    // Some browsers block opening blob URLs in new tabs (popup blockers).
+    // Fallback: trigger a download.
+    if (!win) {
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `fatura-${invoiceId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+  } catch (err) {
+    alert(`Nao foi possivel descarregar o PDF: ${err instanceof Error ? err.message : 'erro desconhecido'}`);
+  }
 }
 
 export function BillingPage() {
@@ -66,6 +122,31 @@ export function BillingPage() {
   const [formError, setFormError] = useState('');
 
   const invoicesQuery = useQuery({ queryKey: ['invoices', 'list'], queryFn: fetchInvoices });
+  const serviceOrdersQuery = useQuery({ queryKey: ['service-orders', 'list'], queryFn: fetchServiceOrdersLookup });
+  const customersQuery = useQuery({ queryKey: ['customers', 'list'], queryFn: fetchCustomersLookup });
+
+  const customerNameByNif = useMemo(
+    () => new Map((customersQuery.data ?? []).map((c) => [c.nif, c.fullName])),
+    [customersQuery.data],
+  );
+
+  const invoicedOrderIds = useMemo(
+    () => new Set((invoicesQuery.data ?? []).map((inv) => inv.serviceOrderId)),
+    [invoicesQuery.data],
+  );
+
+  const eligibleOrderOptions = useMemo(() => {
+    const eligible = (serviceOrdersQuery.data ?? []).filter(
+      (so) => (so.status === 'completed' || so.status === 'delivered') && !invoicedOrderIds.has(so.id),
+    );
+    return [
+      { value: '', label: eligible.length === 0 ? 'Sem ordens elegiveis' : 'Selecionar ordem...' },
+      ...eligible.map((so) => ({
+        value: so.id,
+        label: `OS-${String(so.serviceOrderNumber).padStart(4, '0')} — ${customerNameByNif.get(so.customerNif) ?? so.customerNif}`,
+      })),
+    ];
+  }, [serviceOrdersQuery.data, invoicedOrderIds, customerNameByNif]);
 
   const createMutation = useMutation({
     mutationFn: async (data: typeof form) => {
@@ -81,12 +162,37 @@ export function BillingPage() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      void queryClient.invalidateQueries({ queryKey: ['service-orders'] });
       setCreateOpen(false);
       setForm({ serviceOrderId: '', paymentMethod: '', note: '' });
       setFormError('');
     },
     onError: (err) => {
       setFormError(err instanceof ApiError ? err.message : 'Erro ao emitir fatura.');
+    },
+  });
+
+  const [payInvoiceId, setPayInvoiceId] = useState<string | null>(null);
+  const [payMethod, setPayMethod] = useState('');
+  const [payError, setPayError] = useState('');
+
+  const payMutation = useMutation({
+    mutationFn: async ({ invoiceId, paymentMethod }: { invoiceId: string; paymentMethod: string }) => {
+      await apiFetch(`/invoices/${invoiceId}/payments`, {
+        method: 'POST',
+        headers: { 'Idempotency-Key': `pay-${invoiceId}-${Date.now()}` },
+        body: JSON.stringify({ paymentMethod, paidAt: new Date().toISOString() }),
+      });
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      void queryClient.invalidateQueries({ queryKey: ['service-orders'] });
+      setPayInvoiceId(null);
+      setPayMethod('');
+      setPayError('');
+    },
+    onError: (err) => {
+      setPayError(err instanceof ApiError ? err.message : 'Erro ao registar pagamento.');
     },
   });
 
@@ -136,22 +242,37 @@ export function BillingPage() {
     col.display({
       id: 'actions',
       header: '',
-      cell: (info) => (
-        <div className="flex gap-1">
-          <button
-            onClick={() => downloadPdf(info.row.original.id)}
-            className="rounded-md p-1.5 text-on-surface-variant transition hover:bg-surface-highest hover:text-on-surface"
-          >
-            <Icon name="picture_as_pdf" size={16} />
-          </button>
-          <button
-            onClick={() => setViewInvoice(info.row.original)}
-            className="rounded-md p-1.5 text-on-surface-variant transition hover:bg-surface-highest hover:text-on-surface"
-          >
-            <Icon name="visibility" size={16} />
-          </button>
-        </div>
-      ),
+      cell: (info) => {
+        const inv = info.row.original;
+        const isUnpaid = inv.status === 'pendente' || inv.status === 'vencido';
+        return (
+          <div className="flex gap-1">
+            {isUnpaid && (
+              <button
+                onClick={() => { setPayInvoiceId(inv.id); setPayMethod(''); setPayError(''); }}
+                className="rounded-md p-1.5 text-tertiary transition hover:bg-surface-highest"
+                title="Marcar como paga"
+              >
+                <Icon name="paid" size={16} />
+              </button>
+            )}
+            <button
+              onClick={() => downloadPdf(inv.id)}
+              className="rounded-md p-1.5 text-on-surface-variant transition hover:bg-surface-highest hover:text-on-surface"
+              title="Descarregar PDF"
+            >
+              <Icon name="picture_as_pdf" size={16} />
+            </button>
+            <button
+              onClick={() => setViewInvoice(inv)}
+              className="rounded-md p-1.5 text-on-surface-variant transition hover:bg-surface-highest hover:text-on-surface"
+              title="Ver detalhes"
+            >
+              <Icon name="visibility" size={16} />
+            </button>
+          </div>
+        );
+      },
     }),
   ];
 
@@ -202,14 +323,52 @@ export function BillingPage() {
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title="Emitir Fatura">
         <div className="space-y-4">
           {formError && <p className="text-sm text-error">{formError}</p>}
-          <Input label="ID da Ordem de Servico" value={form.serviceOrderId} onChange={(e) => setForm((p) => ({ ...p, serviceOrderId: e.target.value }))} />
-          <Input label="Metodo de Pagamento" value={form.paymentMethod} onChange={(e) => setForm((p) => ({ ...p, paymentMethod: e.target.value }))} />
+          <Select
+            label="Ordem de Servico"
+            value={form.serviceOrderId}
+            onChange={(e) => setForm((p) => ({ ...p, serviceOrderId: e.target.value }))}
+            options={eligibleOrderOptions}
+          />
+          <Select
+            label="Metodo de Pagamento"
+            value={form.paymentMethod}
+            onChange={(e) => setForm((p) => ({ ...p, paymentMethod: e.target.value }))}
+            options={paymentMethodOptions}
+          />
           <Input label="Nota (opcional)" value={form.note} onChange={(e) => setForm((p) => ({ ...p, note: e.target.value }))} />
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <Button variant="outline" onClick={() => setCreateOpen(false)}>Cancelar</Button>
-          <Button onClick={() => createMutation.mutate(form)} disabled={createMutation.isPending}>
+          <Button
+            onClick={() => createMutation.mutate(form)}
+            disabled={createMutation.isPending || !form.serviceOrderId || !form.paymentMethod}
+          >
             {createMutation.isPending ? 'A emitir...' : 'Emitir Fatura'}
+          </Button>
+        </div>
+      </Modal>
+
+      {/* Register Payment Modal */}
+      <Modal open={!!payInvoiceId} onClose={() => setPayInvoiceId(null)} title="Registar Pagamento">
+        <div className="space-y-4">
+          {payError && <p className="text-sm text-error">{payError}</p>}
+          <p className="text-sm text-on-surface-variant">
+            Selecione o metodo usado pelo cliente para pagar esta fatura.
+          </p>
+          <Select
+            label="Metodo de Pagamento"
+            value={payMethod}
+            onChange={(e) => setPayMethod(e.target.value)}
+            options={paymentMethodOptions}
+          />
+        </div>
+        <div className="mt-6 flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setPayInvoiceId(null)}>Cancelar</Button>
+          <Button
+            onClick={() => payMutation.mutate({ invoiceId: payInvoiceId!, paymentMethod: payMethod })}
+            disabled={payMutation.isPending || !payMethod}
+          >
+            {payMutation.isPending ? 'A registar...' : 'Marcar como Paga'}
           </Button>
         </div>
       </Modal>

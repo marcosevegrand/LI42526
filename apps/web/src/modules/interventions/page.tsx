@@ -1,6 +1,7 @@
 import { interventionSchema, serviceOrderStatuses } from '@gengis-khan/contracts';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -84,6 +85,7 @@ async function fetchInterventionParts(interventionId: string): Promise<Intervent
 
 export function InterventionsPage() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const user = useSessionStore((s) => s.user);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedInterventionId, setSelectedInterventionId] = useState<string | null>(null);
@@ -191,10 +193,7 @@ export function InterventionsPage() {
               <GlassCard
                 key={order.id}
                 className="cursor-pointer p-5 transition hover:ring-1 hover:ring-primary/30"
-                onClick={() => {
-                  setSelectedOrderId(order.id);
-                  setSelectedInterventionId(null);
-                }}
+                onClick={() => navigate(`/service-orders/${order.id}`)}
               >
                 <div className="flex items-center justify-between">
                   <div>

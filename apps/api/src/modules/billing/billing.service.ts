@@ -113,6 +113,7 @@ export class BillingService {
     const source = invoice as {
       id: string;
       invoiceNumber: number;
+      serviceOrderId: string;
       subtotal: { toFixed: (digits: number) => string } | string | number;
       vatAmount: { toFixed: (digits: number) => string } | string | number;
       total: { toFixed: (digits: number) => string } | string | number;
@@ -122,6 +123,7 @@ export class BillingService {
     return {
       id: source.id,
       invoiceNumber: `INV-${String(source.invoiceNumber).padStart(6, '0')}`,
+      serviceOrderId: source.serviceOrderId,
       subtotal: this.formatMoney(source.subtotal),
       vatAmount: this.formatMoney(source.vatAmount),
       total: this.formatMoney(source.total),

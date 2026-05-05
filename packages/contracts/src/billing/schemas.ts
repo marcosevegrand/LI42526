@@ -19,6 +19,7 @@ export const invoicePaymentSchema = z.object({
 export const invoiceSummarySchema = z.object({
   id: z.string(),
   invoiceNumber: z.string(),
+  serviceOrderId: z.string(),
   subtotal: moneySchema,
   vatAmount: moneySchema,
   total: moneySchema,

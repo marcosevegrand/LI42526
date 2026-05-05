@@ -9,6 +9,7 @@ import { DashboardPage } from '../modules/dashboard/page';
 import { InterventionsPage } from '../modules/interventions/page';
 import { InventoryPage } from '../modules/inventory/page';
 import { ReportsPage } from '../modules/reports/page';
+import { ServiceOrderDetailPage } from '../modules/service-orders/detail-page';
 import { ServiceOrdersPage } from '../modules/service-orders/page';
 import { SettingsPage } from '../modules/settings/page';
 import { ScootersPage } from '../modules/scooters/page';
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
       { path: 'customers', element: <CustomersPage /> },
       { path: 'scooters', element: <ScootersPage /> },
       { path: 'service-orders', element: <ServiceOrdersPage /> },
+      { path: 'service-orders/:id', element: <ServiceOrderDetailPage /> },
       { path: 'interventions', element: <InterventionsPage /> },
       { path: 'inventory', element: <InventoryPage /> },
       { path: 'suppliers', element: <SuppliersPage /> },

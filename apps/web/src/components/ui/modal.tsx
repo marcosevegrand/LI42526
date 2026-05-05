@@ -1,4 +1,5 @@
 import { type PropsWithChildren, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 import { cn } from '@/lib/utils/cn';
 
@@ -29,11 +30,11 @@ export function Modal({ open, onClose, title, className, children }: ModalProps)
 
   if (!open) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-surface-dim/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/85 backdrop-blur-md"
         onClick={onClose}
       />
 
@@ -59,6 +60,7 @@ export function Modal({ open, onClose, title, className, children }: ModalProps)
         )}
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
