@@ -8,7 +8,13 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test src/**/*.test.ts"
+    "test": "tsx --test --test-concurrency=1 src/**/*.test.ts",
+    "test:unit": "tsx --test --test-concurrency=1 src/**/*.unit.test.ts",
+    "test:integration": "tsx --test --test-concurrency=1 src/modules/**/*.test.ts",
+    "test:system": "tsx --test --test-concurrency=1 src/system/**/*.test.ts",
+    "test:acceptance": "tsx --test --test-concurrency=1 src/acceptance/**/*.test.ts",
+    "test:quality": "tsx --test --test-concurrency=1 src/quality/**/*.test.ts",
+    "test:coverage": "node --experimental-test-coverage --import=tsx --test --test-concurrency=1 src/**/*.test.ts"
   },
   "dependencies": {
     "@fastify/cookie": "^9.4.0",

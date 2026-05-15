@@ -16,5 +16,7 @@ export const purchaseOrderItemSchema = z.object({
 export const purchaseOrderSchema = z.object({
   id: z.string().optional(),
   supplierId: z.string().min(1),
+  status: z.enum(['requested', 'received']).optional(),
+  deliveredAt: z.string().datetime().nullable().optional(),
   items: z.array(purchaseOrderItemSchema).min(1),
 });

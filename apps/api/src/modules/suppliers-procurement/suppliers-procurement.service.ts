@@ -181,6 +181,8 @@ export class SuppliersProcurementService {
     const source = purchaseOrder as {
       id: string;
       supplierId: string;
+      status: 'requested' | 'received';
+      deliveredAt: Date | null;
       items: Array<{
         partReference: string;
         quantity: number;
@@ -190,6 +192,8 @@ export class SuppliersProcurementService {
     return {
       id: source.id,
       supplierId: source.supplierId,
+      status: source.status,
+      deliveredAt: source.deliveredAt ? source.deliveredAt.toISOString() : null,
       items: source.items.map((item) => ({
         partReference: item.partReference,
         quantity: item.quantity,
